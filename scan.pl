@@ -161,7 +161,7 @@ sub show {
     printf "Average: %s\n", showval($aver);
     printf "Span:    +-%u, ", ($p100 - $p0)/2;
     if($aver) {
-        printf "%.3f%% of average\n", ($p100 - $p0)/2 * 100 / $aver;
+        printf "%.2f%% of average\n", ($p100 - $p0)/2 * 100 / $aver;
     }
     if($bar) {
         my $avdelta;
