@@ -9,4 +9,4 @@ echo "runs single.sh $CODE to $LOG"
 ./single.sh $CODE $PERFDIR > log/$LOG
 echo "now make the HTML"
 ./scan.pl > out/index.html
-./tarballit.sh out
+./tarballit.sh out perf.tar.gz
