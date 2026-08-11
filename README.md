@@ -17,6 +17,8 @@ and SVG images.
 The file is designed to allow single tests to have failed or to be missing in
 the logs. It uses the data it has for each particular section.
 
+All output is generated in the `out/` directory.
+
 ## `graph.plot`
 
 This is the gnuplot file used for the graph for each section.
