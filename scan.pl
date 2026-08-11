@@ -90,13 +90,13 @@ sub dumpcsv {
 }
 
 sub gensvg {
-    my ($filename, $average) = @_;
-    system("gnuplot -c graph.plot out/$filename.csv $average > out/$filename.svg");
+    my ($filename, $suffix, $average) = @_;
+    system("gnuplot -c graph.plot out/$filename.csv $average > out/$filename-$suffix.svg");
 }
 
 sub genpercent {
-    my ($filename, $p0, $p25, $p50, $p75, $p100, $aver) = @_;
-    system("gnuplot -c horizontal.plot $p0 $p25 $p50 $p75 $p100 $aver > out/$filename.svg");
+    my ($filename, $suffix, $p0, $p25, $p50, $p75, $p100, $aver) = @_;
+    system("gnuplot -c horizontal.plot $p0 $p25 $p50 $p75 $p100 $aver > out/$filename-$suffix.svg");
 
 }
 
@@ -181,12 +181,15 @@ sub show {
     }
 
     print "</pre>\n";
-    dumpcsv($filename, $bar, \%a);
-    gensvg($filename, $aver, $bar);
-    genpercent("p-$filename", 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
 
-    print "<img width=\"1200\" src=\"$filename.svg\">\n";
-    print "<br><img width=\"1200\" src=\"p-$filename.svg\">\n";
+    my $suffix = int(rand(100000000));
+    
+    dumpcsv($filename, $bar, \%a);
+    gensvg($filename, $suffix, $aver, $bar);
+    genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
+
+    print "<img width=\"1400\" src=\"$filename-$suffix.svg\">\n";
+    print "<br><img width=\"1400\" src=\"p-$filename-$suffix.svg\">\n";
 }
 
 my @curlv;
@@ -426,14 +429,14 @@ for my $l (sort @logs) {
 
 my $numlogs = scalar(@logs);
 use POSIX qw(strftime);
-my @now = localtime;
-my $now = strftime "%Y-%m-%d %H:%M:%S", @now;
+my @now = gmtime;
+my $now = strftime "%Y-%m-%d %H:%M:%S UTC", @now;
 
 print <<HEAD
 <h1>curl performance tests</h1>
 
-$numlogs builds analyzed. Last run ended $done. This page was rendered
-$now.
+$numlogs builds analyzed. Last run ended $done (Daniel's local time). This
+page was rendered at $now.
 
 HEAD
     ;
