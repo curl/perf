@@ -1,5 +1,5 @@
 # SVG output
-set terminal svg size 1920,580 dynamic font ",24" background rgb 'white'
+set terminal svg size 2520,580 dynamic font ",24" background rgb 'white'
 
 #set title ARG1 font ",48"
 set key outside bottom horizontal
