@@ -508,7 +508,7 @@ show("HTTP/2 parallel requests (100000 x 40)",
      "requests/sec", %h2r);
 show("HTTP/3 parallel requests (100000 x 40)",
      "higher",
-     "h2-requests",
+     "h3-requests",
      "requests/sec", %h3r);
 show("Memory use for HTTP/1 parallel requests (100000 x 40)",
      "lower",
