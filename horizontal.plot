@@ -7,6 +7,7 @@ p25_ms = ARG2 + 0.0
 med_ms = ARG3 + 0.0
 p75_ms = ARG4 + 0.0
 max_ms = ARG5 + 0.0
+avr_ms = ARG6 + 0.0
 
 # Convert values to seconds for time formatting
 min_s = min_ms / 1000.0
@@ -14,6 +15,7 @@ p25_s = p25_ms / 1000.0
 med_s = med_ms / 1000.0
 p75_s = p75_ms / 1000.0
 max_s = max_ms / 1000.0
+avr_s = avr_ms / 1000.0
 
 unset xlabel
 
@@ -50,12 +52,16 @@ set arrow 4 from max_s, (y_pos - h_cap) to max_s, (y_pos + h_cap) nohead lc rgb 
 # Median Line (Highlighted in Red)
 set arrow 5 from med_s, (y_pos - h_box) to med_s, (y_pos + h_box) nohead lc rgb "#DC2626" lw 4
 
+# Average Line (Highlighted in Green)
+set arrow 6 from avr_s, (y_pos - h_box) to avr_s, (y_pos + h_box) nohead lc rgb "#26AC26" lw 4
+
 # --- 4. Point Annotations ---
-#set label 1 sprintf("P0\n%u", min_ms) at min_s, (y_pos + h_cap + 0.18) center font ",18" tc rgb "#374151"
-#set label 2 sprintf("P25\n%u", p25_ms) at p25_s, (y_pos + h_box + 0.18) center font ",18" tc rgb "#374151"
-#set label 3 sprintf("Median\n%u", med_ms) at med_s, (y_pos - h_box - 0.25) center font ",18" tc rgb "#DC2626"
-#set label 4 sprintf("P75\n%u", p75_ms) at p75_s, (y_pos + h_box + 0.18) center font ",18" tc rgb "#374151"
-#set label 5 sprintf("P100\n%u", max_ms) at max_s, (y_pos + h_cap + 0.18) center font ",18" tc rgb "#374151"
+set label 1 sprintf("P0") at min_s, (y_pos + h_cap + 0.18) center font ",18" tc rgb "#374151"
+set label 2 sprintf("P25") at p25_s, (y_pos + h_box + 0.18) center font ",18" tc rgb "#374151"
+set label 3 sprintf("Median") at med_s, (y_pos - h_box - 0.25) center font ",18" tc rgb "#DC2626"
+set label 4 sprintf("P75") at p75_s, (y_pos + h_box + 0.18) center font ",18" tc rgb "#374151"
+set label 5 sprintf("P100") at max_s, (y_pos + h_cap + 0.18) center font ",18" tc rgb "#374151"
+set label 6 sprintf("Average") at avr_s, (y_pos - h_box - 0.16) center font ",18" tc rgb "#26AC26"
 
 # Render graphics canvas
 plot NaN notitle

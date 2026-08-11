@@ -95,8 +95,8 @@ sub gensvg {
 }
 
 sub genpercent {
-    my ($filename, $p0, $p25, $p50, $p75, $p100) = @_;
-    system("gnuplot -c horizontal.plot $p0 $p25 $p50 $p75 $p100 > out/$filename.svg");
+    my ($filename, $p0, $p25, $p50, $p75, $p100, $aver) = @_;
+    system("gnuplot -c horizontal.plot $p0 $p25 $p50 $p75 $p100 $aver > out/$filename.svg");
 
 }
 
@@ -183,7 +183,7 @@ sub show {
     print "</pre>\n";
     dumpcsv($filename, $bar, \%a);
     gensvg($filename, $aver, $bar);
-    genpercent("p-$filename", 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100);
+    genpercent("p-$filename", 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
 
     print "<img width=\"1200\" src=\"$filename.svg\">\n";
     print "<br><img width=\"1200\" src=\"p-$filename.svg\">\n";
