@@ -3,6 +3,9 @@
 # git checkout directory name provided as argument
 CODE="$1"
 
+# directory where the perf code sits
+PERFDIR="$2"
+
 PREF="+%F %T"
 
 cd "$CODE"
@@ -63,4 +66,16 @@ python3 tests/http/scorecard.py -u --upload-count=100 --upload-parallel=50 --upl
 
 date "$PREF ----- h3 parallel upload -----"
 python3 tests/http/scorecard.py -u --upload-count=100 --upload-parallel=50 --upload-sizes=500mb --httpd --json h3 2>h3pu.log | sed 's/^/h3pu: /'
+
+date "$PREF ----- h1 requests -----"
+python3 tests/http/scorecard.py -r --request-count=100000 --request-parallel=40 --json h1 | sed 's/^/h1req: /'
+
+date "$PREF ----- h2 requests -----"
+python3 tests/http/scorecard.py -r --request-count=100000 --request-parallel=40 --json h2 | sed 's/^/h2req: /'
+
+date "$PREF ----- h3 requests -----"
+python3 tests/http/scorecard.py -r --request-count=100000 --request-parallel=40 --json h3 | sed 's/^/h3req: /'
+
+# Remember the stakes when this ran
+cat $PERFDIR/stakes.conf | sed 's/^/stakes: /'
 date "$PREF done"

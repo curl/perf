@@ -1,8 +1,11 @@
 #!/bin/sh
 
 LOG=`date "+perf-%Y-%m-%d-%H-%M-%S.log"`
-cd $HOME/src/curl-perf
+PERFDIR=$HOME/src/curl-perf
 
+cd $PERFDIR
 CODE=$HOME/src/curl-perf-code
 echo "runs single.sh $CODE to $LOG"
-./single.sh $CODE > log/$LOG
+./single.sh $CODE $PERFDIR > log/$LOG
+echo "now make the HTML"
+./scan.pl > out/index.html
