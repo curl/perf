@@ -115,5 +115,5 @@ The second graph per test illustrates the data distribution. The leftmost
 vertical bar is P0, the blue box is marked from P25 to P75 and the rightmost
 vertical bar is P100.
 
-The *average* and *median* values are marked as a green and red vertical
+The *average* and *median* values are marked as green and red vertical
 markers.
