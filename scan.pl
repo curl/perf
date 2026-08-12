@@ -125,14 +125,14 @@ sub dumpcsv {
         $prevc = $commit;
     }
 
+    $min = minimum(@vals);
+    $v = median(@vals);
+    $max = maximum(@vals);
     push @av, $v;
     if(scalar(@av) > 4) {
         shift @av;
     }
     $av = average(@av);
-    $min = minimum(@vals);
-    $v = median(@vals);
-    $max = maximum(@vals);
     printf D "%u;%s;%s;%s;%s;%u;%s\n", $index++, $gitalias{$prevc},
         $min, $v, $max, $av, $bar;
 
