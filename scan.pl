@@ -564,6 +564,36 @@ for my $c (@inorder) {
     printf "<a href=\"%s/%s\">%s</a>, ", $commitbase, $c, $gitalias{$c};
 }
 
+my @alltests = ("100G-speed",
+               "single-numallocs",
+               "single-maxalloc",
+               "h1parallel-speed",
+               "h2parallel-speed",
+               "h3parallel-speed",
+               "h1parallel-mem",
+               "h2parallel-mem",
+               "h3parallel-mem",
+               "h1parallel-upload-speed",
+               "h2parallel-upload-speed",
+               "h3parallel-upload-speed",
+               "h1parallel-upload-mem",
+               "h2parallel-upload-mem",
+               "h3parallel-upload-mem",
+               "h1-requests",
+               "h2-requests",
+               "h3-requests",
+               "h1-req-mem",
+               "h2-req-mem",
+               "h3-req-mem",
+               "easy-handle",
+               "multi-handle",
+               "connectdata",
+    );
+print "<p> Available tests: ";
+for my $t (@alltests) {
+    print "<a href=\"#$t\">$t</a>, ";
+}
+
 show("Download speed 100G single transfer HTTP://",
      "higher",
      "100G-speed",
