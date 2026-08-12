@@ -32,6 +32,9 @@ unset border
 # Syntax: set offset <left>, <right>, <top>, <bottom>
 set offset 0, 0, graph 0.25, graph 0.05
 
+# add a little margin below the plot to move out the key
+set bmargin 5
+
 set xtics 1 out font ",32"
 set ytics out
 
