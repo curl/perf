@@ -11,6 +11,7 @@ mean_v = ARG6 + 0.0
 
 unset xlabel
 set format x "%.2s %c"
+set xtics in font ",20"
 
 # Zoom X-axis to the data range (with padding) to prevent compression
 set xrange [p0_v - p0_v/1000 : p100_v + p100_v/1000]
