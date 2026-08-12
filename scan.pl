@@ -77,7 +77,6 @@ sub dumpcsv {
         my $min;
         my $max;
         if($commit ne $prevc) {
-            $prevc = $commit;
             if($vals[0]) {
                 $min = minimum(@vals);
                 $v = median(@vals);
@@ -87,12 +86,14 @@ sub dumpcsv {
             }
             else {
                 # this is the first
+                $prevc = $commit;
                 push @vals, $aref->{$key};
                 next;
             }
         }
         else {
             # the same commit as the previous, accumulate
+            $prevc = $commit;
             push @vals, $aref->{$key};
             next;
         }
@@ -103,8 +104,9 @@ sub dumpcsv {
         }
         $av = average(@av);
 
-        printf D "%u;%s;%u;%u;%u;%u;%s\n", $index++, $commit,
+        printf D "%u;%s;%u;%u;%u;%u;%s\n", $index++, $gitalias{$prevc},
             $min, $v, $max, $av, $bar;
+        $prevc = $commit;
     }
 
     $min = minimum(@vals);
@@ -112,7 +114,7 @@ sub dumpcsv {
     $max = maximum(@vals);
     $av -= $av/10;
     $av += $v/10;
-    printf D "%u;%s;%s;%s;%s;%u;%s\n", $index++, $prevc,
+    printf D "%u;%s;%s;%s;%s;%u;%s\n", $index++, $gitalias{$prevc},
         $min, $v, $max, $av, $bar;
 
     close(D);
@@ -457,8 +459,14 @@ for my $l (sort @logs) {
 }
 
 my $gitcommits;
-for my $c (keys %git) {
+my $short = 0;
+for my $c (sort keys %git) {
     $gitcommits{$git{$c}}++;
+    if($gitcommits{$git{$c}} == 1) {
+        push @inorder, $git{$c};
+        $gitalias{$git{$c}} = sprintf("C%u", $short);
+        $short++;
+    }
 }
 
 my $numcommits = scalar(keys %gitcommits);
@@ -479,6 +487,11 @@ page was rendered at $now.
 
 HEAD
     ;
+
+my $commitbase = "https://github.com/curl/curl/commit";
+for my $c (@inorder) {
+    printf "<a href=\"%s/%s\">%s</a>, ", $commitbase, $c, $gitalias{$c};
+}
 
 show("Download speed 100G single transfer HTTP://",
      "higher",
