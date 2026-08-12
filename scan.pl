@@ -655,11 +655,11 @@ show("Curl_easy struct size",
 show("Curl_multi struct size",
      "lower",
      "multi-handle",
-     "bytes", %curlmulti);
+     "bytes", %curlmulti) if %curlmulti;
 show("connectdata struct size",
      "lower",
      "connectdata",
-     "bytes", %connectdata);
+     "bytes", %connectdata) if %connectdata;
 
 print "<h3> configure</h3>";
 print @confopts;
