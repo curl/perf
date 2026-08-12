@@ -76,6 +76,9 @@ python3 tests/http/scorecard.py -r --request-count=100000 --request-parallel=40 
 date "$PREF ----- h3 requests -----"
 python3 tests/http/scorecard.py -r --request-count=100000 --request-parallel=40 --json h3 | sed 's/^/h3req: /'
 
+date "$PREF ----- struct sizes -----"
+pahole lib/.libs/libcurl.a -C Curl_easy,Curl_multi,connectdata -s | | sed 's/^/structs: /'
+
 # Remember the stakes when this ran
 cat $PERFDIR/stakes.conf | sed 's/^/stakes: /'
 date "$PREF done"
