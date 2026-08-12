@@ -76,22 +76,27 @@ sub stddev {
 }
 
 sub dumpcsv {
-    my ($filename, $bar, $aref) = @_;
+    my ($filename, $aref) = @_;
     open(D, ">$outdir/$filename.csv");
     my $index = 0;
     my $av;
     my @av;
     my $prevc = "";
     my @vals;
-    if($stake{$key, $filename, 'val'}) {
-        # there is a specific stake for this test in this build
-        $bar = $stake{$key, $filename, 'val'};
-    }
     for my $key (sort keys %$aref) {
         my $commit = $git{$key};
         my $v;
         my $min;
         my $max;
+        my $bar = "";
+        if($stake{$key, $filename, 'val'}) {
+            # there is a specific stake for this test in this build
+            $bar = $stake{$key, $filename, 'val'};
+        }
+        else {
+            # don't use the default one
+            $bar = "";
+        }
         if($commit ne $prevc) {
             if($vals[0]) {
                 $min = minimum(@vals);
@@ -243,8 +248,8 @@ sub show {
 
     my $suffix = int(rand(100000000));
     
-    dumpcsv($filename, $bar, \%a);
-    gensvg($filename, $suffix, $aver, $bar);
+    dumpcsv($filename, \%a);
+    gensvg($filename, $suffix, $aver);
     genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
 
     print "<img src=\"$filename-$suffix.svg\">\n";
