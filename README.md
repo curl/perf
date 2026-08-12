@@ -81,8 +81,8 @@ adjusted as we change code and alter conditions.
 Each stake has a date field and a comment, they are shown.
 Then the stake is displayed.
 
-A *delta* from the stake to the *average* is shown and a helper that explains
-if the delta shows the current average as better or worse compared to the
+A *delta* from the stake to the *mean* is shown and a helper that explains
+if the delta shows the current mean as better or worse compared to the
 stake.
 
 A second *delta* from the stake to the *median* (P50) is shown and a helper
@@ -100,9 +100,9 @@ graph.
 
 There are three additional plots in the graph:
 
-- *average* is the average value taken from all builds in the set
+- *mean* is the mean value taken from all builds in the set
 - *stake* is the predetermined (ideal) value to compare against for this test
-- *moving average* is the average value of the 4 latest commits' (median)
+- *moving average* is the mean value of the 4 latest commits' (median)
   values
 
 The leftmost datapoint is the oldest commit. Later ones move to the right.
@@ -118,5 +118,4 @@ The second graph per test illustrates the data distribution. The leftmost
 vertical bar is P0, the blue box is marked from P25 to P75 and the rightmost
 vertical bar is P100.
 
-The *average* and *median* values are marked as green and red vertical
-markers.
+The *mean* and *median* values are marked as green and red vertical markers.

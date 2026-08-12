@@ -52,7 +52,7 @@ set arrow 4 from max_s, (y_pos - h_cap) to max_s, (y_pos + h_cap) nohead lc rgb 
 # Median Line (Highlighted in Red)
 set arrow 5 from med_s, (y_pos - h_box) to med_s, (y_pos + h_box) nohead lc rgb "#DC2626" lw 4
 
-# Average Line (Highlighted in Green)
+# Mean Line (Highlighted in Green)
 set arrow 6 from avr_s, (y_pos - h_box) to avr_s, (y_pos + h_box) nohead lc rgb "#26AC26" lw 4
 
 # --- 4. Point Annotations ---
@@ -61,7 +61,7 @@ set label 2 sprintf("P25") at p25_s, (y_pos + h_box + 0.18) center font ",18" tc
 set label 3 sprintf("Median") at med_s, (y_pos - h_box - 0.25) center font ",18" tc rgb "#DC2626"
 set label 4 sprintf("P75") at p75_s, (y_pos + h_box + 0.18) center font ",18" tc rgb "#374151"
 set label 5 sprintf("P100") at max_s, (y_pos + h_cap + 0.18) center font ",18" tc rgb "#374151"
-set label 6 sprintf("Average") at avr_s, (y_pos - h_box - 0.16) center font ",18" tc rgb "#26AC26"
+set label 6 sprintf("Mean") at avr_s, (y_pos - h_box - 0.16) center font ",18" tc rgb "#26AC26"
 
 # Render graphics canvas
 plot NaN notitle

@@ -50,7 +50,7 @@ sub maximum {
     return $vals[0];
 }
 
-sub average {
+sub mean {
     my @p = @_;
     my $sum;
     for my $y (@p) {
@@ -65,7 +65,7 @@ sub stddev {
     if($count < 2) {
         return 0; # can't be done
     }
-    my $mean = average(@p);
+    my $mean = mean(@p);
     my $sqsum = 0;
     foreach my $n (@p) {
         $sqsum += ($n - $mean) ** 2;
@@ -118,7 +118,7 @@ sub dumpcsv {
         if(scalar(@av) > 4) {
             shift @av;
         }
-        $av = average(@av);
+        $av = mean(@av);
 
         printf D "%u;%s;%u;%u;%u;%u;%s\n", $index++, $gitalias{$prevc},
             $min, $v, $max, $av, $bar;
@@ -132,7 +132,7 @@ sub dumpcsv {
     if(scalar(@av) > 4) {
         shift @av;
     }
-    $av = average(@av);
+    $av = mean(@av);
     printf D "%u;%s;%s;%s;%s;%u;%s\n", $index++, $gitalias{$prevc},
         $min, $v, $max, $av, $bar;
 
@@ -140,8 +140,8 @@ sub dumpcsv {
 }
 
 sub gensvg {
-    my ($filename, $suffix, $average) = @_;
-    system("gnuplot -c $graphplot $outdir/$filename.csv $average > $outdir/$filename-$suffix.svg");
+    my ($filename, $suffix, $mean) = @_;
+    system("gnuplot -c $graphplot $outdir/$filename.csv $mean > $outdir/$filename-$suffix.svg");
 }
 
 sub genpercent {
@@ -202,7 +202,7 @@ sub show {
     $p50 = median(values %a);
     $p75 = p75(values %a);
     $p100 = maximum(values %a);
-    $aver = average(values %a);
+    $aver = mean(values %a);
     my $std = stddev(values %a);
 
     printf "P0:      %s\n", showval($p0);
@@ -210,14 +210,14 @@ sub show {
     printf "P50:     %s\n", showval($p50);
     printf "P75:     %s\n", showval($p75);
     printf "P100:    %s\n", showval($p100);
-    printf "Average: %s\n", showval($aver);
+    printf "Mean:    %s\n", showval($aver);
     printf "Std dev: %s", showval($std);
     if($aver) {
-        printf ", %.2f%% of average",  $std * 100 / $aver;
+        printf ", %.2f%% of mean",  $std * 100 / $aver;
     }
     printf "\nSpan:    +-%s", showval(($p100 - $p0)/2);
     if($aver) {
-        printf ", %.2f%% of average", ($p100 - $p0)/2 * 100 / $aver;
+        printf ", %.2f%% of mean", ($p100 - $p0)/2 * 100 / $aver;
     }
     print "\n";
     if($bar) {
@@ -228,7 +228,7 @@ sub show {
             $stake{"default", $filename, 'desc'};
         printf "         %s\n", showval($bar);
         $avdelta = $bar - $aver;
-        printf "         %s from average, (%.2f%%) %s\n",
+        printf "         %s from mean, (%.2f%%) %s\n",
             showval($avdelta),
             ($avdelta * 100) / $aver,
             deltaopinion($avdelta, $which);
