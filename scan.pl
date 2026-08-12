@@ -434,7 +434,6 @@ sub single {
         }
         elsif(/^structs: (.*)\t(\d+)\t1/) {
             my ($struct, $size) = ($1,$2);
-            print STDERR "$struct = $size\n";
             if($struct eq "Curl_easy") {
                 $curleasy{$scan} = $size;
             }
@@ -652,7 +651,7 @@ show("Memory use for HTTP/3 parallel requests (100000 x 40)",
 show("Curl_easy struct size",
      "lower",
      "easy-handle",
-     "bytes", %curleasy);
+     "bytes", %curleasy) if %curleasy;
 show("Curl_multi struct size",
      "lower",
      "multi-handle",
