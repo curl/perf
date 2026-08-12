@@ -52,6 +52,11 @@ sub maximum {
 
 sub mean {
     my @p = @_;
+
+    if(!scalar(@p)) {
+        # precaution
+        return -1; # odd value
+    }
     my $sum;
     for my $y (@p) {
         $sum += $y;
@@ -427,6 +432,18 @@ sub single {
         elsif(/^stakes: (.*)/) {
             push @stakes, $1;
         }
+        elsif(/^structs: (.*)\t(\d+)\t\d*/) {
+            my ($struct, $size) = ($1,$2);
+            if($struct eq "Curl_easy") {
+                $curleasy{$scan} = $size;
+            }
+            elsif($struct eq "Curl_multi") {
+                $curlmulti{$scan} = $size;
+            }
+            elsif($struct eq "connectdata") {
+                $connectdata{$scan} = $size;
+            }
+        }
     }
     close(F);
 
@@ -631,6 +648,18 @@ show("Memory use for HTTP/3 parallel requests (100000 x 40)",
      "lower",
      "h3-req-mem",
      "bytes", %h3rbytes);
+show("Curl_easy struct size",
+     "lower",
+     "easy-handle",
+     "bytes", %curleasy) if %curleasy;
+show("Curl_multi struct size",
+     "lower",
+     "multi-handle",
+     "bytes", %curlmulti) if %curlmulti;
+show("connectdata struct size",
+     "lower",
+     "connectdata",
+     "bytes", %connectdata) if %connectdata;
 
 print "<h3> configure</h3>";
 print @confopts;
