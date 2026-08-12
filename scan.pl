@@ -83,19 +83,17 @@ sub dumpcsv {
     my @av;
     my $prevc = "";
     my @vals;
+    my $bar = "";
     for my $key (sort keys %$aref) {
         my $commit = $git{$key};
         my $v;
         my $min;
         my $max;
-        my $bar = "";
         if($stake{$key, $filename, 'val'}) {
             # there is a specific stake for this test in this build
             $bar = $stake{$key, $filename, 'val'};
-        }
-        else {
-            # don't use the default one
-            $bar = "";
+            # then keep this value, for the last entry or if the next one
+            # would weirdly lack it
         }
         if($commit ne $prevc) {
             if($vals[0]) {
