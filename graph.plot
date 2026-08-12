@@ -16,10 +16,10 @@ set style line 5 linecolor rgb '#ff2020' linetype 1 linewidth 1
 # Maximum line
 set style line 6 linecolor rgb '#20ff20' linetype 1 linewidth 1
 
-# Style for average line
+# Style for mean line
 set style line 2 linecolor rgb '#e41a1c' linetype 2 linewidth 2 dashtype 2
 
-# Style for the moving average
+# Style for the moving mean
 set style line 3 linecolor rgb '#40b040' linetype 1 linewidth 2 dashtype 2
 
 # Style for the stake
@@ -46,4 +46,4 @@ plot ARG1 using 1:3 with lines linestyle 5 title "min", \
      ARG1 using 1:5 with lines linestyle 6 title "max", \
      ARG1 using 1:6 with lines linestyle 3 title "moving average", \
      ARG1 using 1:7 with lines linestyle 4 title "stake", \
-     ARG2 + 0 with lines linestyle 2 title "average"
+     ARG2 + 0 with lines linestyle 2 title "mean"
