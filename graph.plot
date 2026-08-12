@@ -1,5 +1,5 @@
 # SVG output
-set terminal svg size 2520,580 dynamic font ",24" background rgb 'white'
+set terminal svg size 2520,1080 dynamic font ",24" background rgb 'white'
 
 #set title ARG1 font ",48"
 set key outside bottom horizontal box center
@@ -12,18 +12,18 @@ set key outside bottom horizontal box center
 set style line 1 linecolor rgb '#0060ad' linetype 1 linewidth 3 \
   pointtype 7 pointsize .5
 # Minimum line
-set style line 5 linecolor rgb '#ff2020' linetype 1 linewidth 1
+set style line 5 linecolor rgb '#ff2020' linetype 1 linewidth 2
 # Maximum line
-set style line 6 linecolor rgb '#20ff20' linetype 1 linewidth 1
+set style line 6 linecolor rgb '#20ff20' linetype 1 linewidth 2
 
 # Style for mean line
 set style line 2 linecolor rgb '#e41a1c' linetype 2 linewidth 2 dashtype 2
 
 # Style for the moving mean
-set style line 3 linecolor rgb '#40b040' linetype 1 linewidth 2 dashtype 2
+set style line 3 linecolor rgb '#4060a0' linetype 1 linewidth 2 dashtype 3
 
 # Style for the stake
-set style line 4 linecolor rgb '#a0a000' linetype 1 linewidth 2 dashtype 2
+set style line 4 linecolor rgb '#a0a000' linetype 1 linewidth 2 dashtype 4
 
 set grid
 unset border
@@ -35,8 +35,8 @@ set offset 0, 0, graph 0.25, graph 0.05
 # add a little margin below the plot to move out the key
 set bmargin 5
 
-set xtics 1 out font ",32"
-set ytics out
+set xtics 1 out font ",32" nomirror
+set ytics out font ",32" nomirror
 
 set format y "%.2s %c"
 
