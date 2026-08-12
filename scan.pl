@@ -247,8 +247,8 @@ sub show {
     gensvg($filename, $suffix, $aver, $bar);
     genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
 
-    print "<img width=\"1400\" src=\"$filename-$suffix.svg\">\n";
-    print "<br><img width=\"1400\" src=\"p-$filename-$suffix.svg\">\n";
+    print "<img src=\"$filename-$suffix.svg\">\n";
+    print "<br><img src=\"p-$filename-$suffix.svg\">\n";
 }
 
 my @curlv;
