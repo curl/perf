@@ -1,28 +1,16 @@
 # SVG output
 set terminal svg size 1920,380 dynamic font ",24" background rgb 'white'
 
-# --- 1. Data Definitions (in milliseconds) ---
-min_ms = ARG1 + 0.0
-p25_ms = ARG2 + 0.0
-med_ms = ARG3 + 0.0
-p75_ms = ARG4 + 0.0
-max_ms = ARG5 + 0.0
-avr_ms = ARG6 + 0.0
-
-# Convert values to seconds for time formatting
-min_s = min_ms / 1000.0
-p25_s = p25_ms / 1000.0
-med_s = med_ms / 1000.0
-p75_s = p75_ms / 1000.0
-max_s = max_ms / 1000.0
-avr_s = avr_ms / 1000.0
+# --- 1. Data Definitions ---
+min_s = ARG1 + 0.0
+p25_s = ARG2 + 0.0
+med_s = ARG3 + 0.0
+p75_s = ARG4 + 0.0
+max_s = ARG5 + 0.0
+avr_s = ARG6 + 0.0
 
 unset xlabel
-
-# Convert seconds on X-axis into HH:MM:SS format
-set xdata time
-set timefmt "%s"
-set format x ""
+set format x "%.2s %c"
 
 # Zoom X-axis to the data range (with padding) to prevent compression
 set xrange [min_s - min_s/1000 : max_s + max_s/1000]
@@ -30,7 +18,7 @@ set xrange [min_s - min_s/1000 : max_s + max_s/1000]
 # Clean Y-axis layout
 set yrange [0:2]
 unset ytics
-set grid x lc rgb "#E5E7EB" lw 1
+unset grid
 
 # --- 3. Box & Whisker Geometry ---
 y_pos = 1.0       # Central Y level
