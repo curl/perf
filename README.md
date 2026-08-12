@@ -67,6 +67,8 @@ Then follows a little table:
 - *P75* - the 75th percentile.
 - *P100* - the largest value of all. The maximum.
 - *Average* - average value based on all samples
+- *Std dev* - standard deviation. Measures the amount of variation of the
+  values.
 - *Span* - Half the delta between *P100* and *P0* and how big portion of
   *average* that value is.
 
