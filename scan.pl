@@ -177,10 +177,6 @@ sub showval {
         # less than a million
         return "$sign$v";
     }
-    elsif($v < 1000000) {
-        my $s = sprintf("%.2f", $val / 1000);
-        return "$sign$v ($s K)";
-    }
     elsif(($v/1000000) < 1000) {
         my $s = sprintf("%.2f", $val / 1000000);
         return "$sign$v ($s M)";
