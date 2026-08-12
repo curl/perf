@@ -42,7 +42,7 @@ set datafile separator ";"
 plot ARG1 using 1:3 with lines linestyle 5 title "min", \
      ARG1 using 1:4 with linespoints linestyle 1 title "value", \
      ARG1 using 1:5 with lines linestyle 6 title "max", \
-     ARG1 using 1:4:2 with labels title "" offset 0,1 font ", 36" tc lt 2, \
+     ARG1 using 1:4:2 with labels title "" offset 0,1 font ", 36" tc lt 6, \
      ARG1 using 1:6 with lines linestyle 3 title "moving average", \
      ARG1 using 1:7 with lines linestyle 4 title "stake", \
      ARG2 + 0 with lines linestyle 2 title "average"
