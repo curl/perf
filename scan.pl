@@ -59,6 +59,29 @@ sub average {
     return $sum / scalar(@p);
 }
 
+sub stddev {
+    my @p = @_;
+    my $count = scalar @p;
+    if($count < 2) {
+        return 0; # can't be done
+    }
+    my $mean = average(@p);
+
+    # Calculate the sum of squared differences
+    my $sqsum = 0;
+    foreach my $n (@p) {
+        $sqsum += ($n - $mean) ** 2;
+    }
+
+    # Calculate Sample Standard Deviation (divided by N - 1)
+    my $sample_std_dev = sqrt($sqsum / ($count - 1));
+
+    # Calculate Population Standard Deviation (divided by N)
+    my $pop_std_dev = sqrt($sqsum / $count);
+
+    return $sample_std_dev;
+}
+
 sub dumpcsv {
     my ($filename, $bar, $aref) = @_;
     open(D, ">$outdir/$filename.csv");
@@ -183,6 +206,7 @@ sub show {
     $p75 = p75(values %a);
     $p100 = maximum(values %a);
     $aver = average(values %a);
+    my $std = stddev(values %a);
 
     printf "P0:      %s\n", showval($p0);
     printf "P25:     %s\n", showval($p25);
@@ -190,10 +214,15 @@ sub show {
     printf "P75:     %s\n", showval($p75);
     printf "P100:    %s\n", showval($p100);
     printf "Average: %s\n", showval($aver);
-    printf "Span:    +-%u, ", ($p100 - $p0)/2;
+    printf "Std dev: %s", showval($std);
     if($aver) {
-        printf "%.2f%% of average\n", ($p100 - $p0)/2 * 100 / $aver;
+        printf ", %.2f%% of average",  $std * 100 / $aver;
     }
+    printf "\nSpan:    +-%u", ($p100 - $p0)/2;
+    if($aver) {
+        printf ", %.2f%% of average", ($p100 - $p0)/2 * 100 / $aver;
+    }
+    print "\n";
     if($bar) {
         my $avdelta;
         my $p50delta;
