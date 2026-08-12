@@ -4,6 +4,8 @@ use JSON;
 use Data::Dumper;
 
 my $logdir = "log";
+my $outdir = "out";
+my $graphplot = "graph.plot";
 
 opendir(my $dh, $logdir) || die "Can't open dir: $!";
 my @logs = grep { /^perf.*\.log/ && -f "$logdir/$_" } readdir($dh);
@@ -59,44 +61,71 @@ sub average {
 
 sub dumpcsv {
     my ($filename, $bar, $aref) = @_;
-    open(D, ">out/$filename.csv");
+    open(D, ">$outdir/$filename.csv");
     my $index = 0;
     my $av;
+    my @av;
     my $prevc = "";
-    for my $key (sort keys %$aref) {
-        my $v = $aref->{$key};
-        if($av) {
-            $av -= $av/10;
-            $av += $v/10;
-        }
-        else {
-            # should be the first only
-            $av = $v;
-        }
-        if($stake{$key, $filename, 'val'}) {
-            # there is a specific stake for this test in this build
-            $bar = $stake{$key, $filename, 'val'};
-        }
-        my $commit = $git{$key};
-        if($commit eq $prevc) {
-            $commit = "";
-        }
-        else {
-            $prevc = $commit;
-        }
-        printf D "%u;%s;%s;%u;%s\n", $index++, $commit, $v, $av, $bar;
+    my @vals;
+    if($stake{$key, $filename, 'val'}) {
+        # there is a specific stake for this test in this build
+        $bar = $stake{$key, $filename, 'val'};
     }
+    for my $key (sort keys %$aref) {
+        my $commit = $git{$key};
+        my $v;
+        my $min;
+        my $max;
+        if($commit ne $prevc) {
+            $prevc = $commit;
+            if($vals[0]) {
+                $min = minimum(@vals);
+                $v = median(@vals);
+                $max = maximum(@vals);
+                undef @vals;
+                push @vals, $aref->{$key};
+            }
+            else {
+                # this is the first
+                push @vals, $aref->{$key};
+                next;
+            }
+        }
+        else {
+            # the same commit as the previous, accumulate
+            push @vals, $aref->{$key};
+            next;
+        }
+
+        push @av, $v;
+        if(scalar(@av) > 4) {
+            shift @av;
+        }
+        $av = average(@av);
+
+        printf D "%u;%s;%u;%u;%u;%u;%s\n", $index++, $commit,
+            $min, $v, $max, $av, $bar;
+    }
+
+    $min = minimum(@vals);
+    $v = median(@vals);
+    $max = maximum(@vals);
+    $av -= $av/10;
+    $av += $v/10;
+    printf D "%u;%s;%s;%s;%s;%u;%s\n", $index++, $prevc,
+        $min, $v, $max, $av, $bar;
+
     close(D);
 }
 
 sub gensvg {
     my ($filename, $suffix, $average) = @_;
-    system("gnuplot -c graph.plot out/$filename.csv $average > out/$filename-$suffix.svg");
+    system("gnuplot -c $graphplot $outdir/$filename.csv $average > $outdir/$filename-$suffix.svg");
 }
 
 sub genpercent {
     my ($filename, $suffix, $p0, $p25, $p50, $p75, $p100, $aver) = @_;
-    system("gnuplot -c horizontal.plot $p0 $p25 $p50 $p75 $p100 $aver > out/$filename-$suffix.svg");
+    system("gnuplot -c horizontal.plot $p0 $p25 $p50 $p75 $p100 $aver > $outdir/$filename-$suffix.svg");
 
 }
 
@@ -427,6 +456,13 @@ for my $l (sort @logs) {
     single("$logdir/$l");
 }
 
+my $gitcommits;
+for my $c (keys %git) {
+    $gitcommits{$git{$c}}++;
+}
+
+my $numcommits = scalar(keys %gitcommits);
+
 my $numlogs = scalar(@logs);
 use POSIX qw(strftime);
 my @now = gmtime;
@@ -437,6 +473,9 @@ print <<HEAD
 
 $numlogs builds analyzed. Last run ended $done (Daniel's local time). This
 page was rendered at $now.
+
+<p>
+  $numcommits commits.
 
 HEAD
     ;
