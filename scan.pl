@@ -190,6 +190,25 @@ sub showval {
     }
 }
 
+sub showdocs {
+    my ($test) = @_;
+    open(D, "<describe-tests.conf");
+    my $m = 0;
+    while(<D>) {
+        if($m && /^\[/) {
+            # we are done
+            last;
+        }
+        elsif(/^\[$test\]/) {
+            $m = 1; # this is us
+        }
+        elsif($m) {
+            print $_;
+        }
+    }
+    close(D);
+}
+
 sub show {
     my ($name, $which, $filename, $unit, %a) = @_;
 
@@ -249,6 +268,10 @@ sub show {
     dumpcsv($filename, \%a);
     gensvg($filename, $suffix, $aver);
     genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
+
+    print "<details><summary>test description</summary>\n";
+    showdocs($filename);
+    print "</details>\n";
 
     print "<img src=\"$filename-$suffix.svg\">\n";
     print "<br><img src=\"p-$filename-$suffix.svg\">\n";
