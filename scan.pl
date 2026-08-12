@@ -168,21 +168,26 @@ sub deltaopinion {
 sub showval {
     my ($val) = @_;
     my $v = int($val);
-    if($val < 1000000) {
+    my $sign = "";
+    if($v < 0) {
+        $sign = "-";
+        $v = -$v;
+    }
+    if($v < 1000000) {
         # less than a million
-        return "$v";
+        return "$sign$v";
     }
-    elsif($val < 10000000) {
+    elsif($v < 1000000) {
         my $s = sprintf("%.2f", $val / 1000);
-        return "$v ($s K)";
+        return "$sign$v ($s K)";
     }
-    elsif(($val/1000000) < 1000) {
+    elsif(($v/1000000) < 1000) {
         my $s = sprintf("%.2f", $val / 1000000);
-        return "$v ($s M)";
+        return "$sign$v ($s M)";
     }
     else {
         my $s = sprintf("%.2f", $val / 1000000000);
-        return "$v ($s G)";
+        return "$sign$v ($s G)";
     }
 }
 
@@ -214,7 +219,7 @@ sub show {
     if($aver) {
         printf ", %.2f%% of average",  $std * 100 / $aver;
     }
-    printf "\nSpan:    +-%u", ($p100 - $p0)/2;
+    printf "\nSpan:    +-%s", showval(($p100 - $p0)/2);
     if($aver) {
         printf ", %.2f%% of average", ($p100 - $p0)/2 * 100 / $aver;
     }
@@ -227,12 +232,14 @@ sub show {
             $stake{"default", $filename, 'desc'};
         printf "         %s\n", showval($bar);
         $avdelta = $bar - $aver;
-        printf "         %d from average, (%.2f%%) %s\n",
-            $avdelta, ($avdelta * 100) / $aver,
+        printf "         %s from average, (%.2f%%) %s\n",
+            showval($avdelta),
+            ($avdelta * 100) / $aver,
             deltaopinion($avdelta, $which);
         $p50delta = $bar - $p50;
-        printf "         %d from P50, (%.2f%%) %s\n",
-            $p50delta, ($p50delta * 100) / $p50,
+        printf "         %s from P50, (%.2f%%) %s\n",
+            showval($p50delta),
+            ($p50delta * 100) / $p50,
             deltaopinion($p50delta, $which);
     }
 
