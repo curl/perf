@@ -81,15 +81,131 @@ sub stddev {
     return $sample_std_dev;
 }
 
-sub dumpcsv {
-    my ($filename, $aref) = @_;
+# entries to store in the "last N builds" CSV
+my $numlast = 100;
+
+sub storelatest {
+    my ($filename, @o) = @_;
+
+    # This should store only the last N entries
+    while(scalar(@o) > $numlast) {
+        shift @o;
+    }
     open(D, ">$outdir/$filename.csv");
+    print D @o;
+    close(D);
+}
+
+# entries to store in the LTTB CSV
+my $numlttb = 20;
+
+sub storelttb {
+    my ($filename, @o) = @_;
+
+    # Helper to parse (X, Y) from a CSV row
+    # Row format: index;name;minimum;median;maximum;average;bar
+    my $parse_pt = sub {
+        my ($line) = @_;
+        my @f = split /;/, $line;
+        # X = index (col 0), Y = average (col 5) or median (col 3)
+        my $x = defined $f[0] ? $f[0] + 0 : 0;
+        my $y = defined $f[5] && $f[5] ne '' ? $f[5] + 0 : ($f[3] // 0) + 0;
+        return ($x, $y);
+    };
+
+    my $nin = scalar @o;
+
+    # No downsampling needed if input has fewer or equal entries than requested
+    if ($nin <= $numlttb || $numlttb < 3) {
+        open(D, ">$outdir/lt-$filename.csv") or die "Cannot open file: $!";
+        print D @o;
+        close(D);
+        return;
+    }
+
+    my @sampled;
+
+    # 1. Always keep the first point
+    push @sampled, $o[0];
+    my ($ax, $ay) = $parse_pt->($o[0]);
+
+    # Calculate bucket size for the remaining intermediate points
+    my $bucket_size = ($nin - 2) / ($numlttb - 2);
+
+    # 2. Process each intermediate bucket
+    for my $i (0 .. $numlttb - 3) {
+        # Determine range of current bucket B_i
+        my $range_start = int($i * $bucket_size) + 1;
+        my $range_end   = int(($i + 1) * $bucket_size) + 1;
+        $range_end = $nin - 1 if $range_end > $nin - 1;
+
+        # Determine range of next bucket B_{i+1} to compute its center of mass
+        # (C)
+        my $next_start = int(($i + 1) * $bucket_size) + 1;
+        my $next_end   = int(($i + 2) * $bucket_size) + 1;
+        $next_end = $nin if $next_end > $nin;
+
+        # Calculate average (center of mass) for next bucket B_{i+1}
+        my ($avg_x, $avg_y, $count) = (0, 0, 0);
+        for my $j ($next_start .. $next_end - 1) {
+            my ($px, $py) = $parse_pt->($o[$j]);
+            $avg_x += $px;
+            $avg_y += $py;
+            $count++;
+        }
+
+        if ($count > 0) {
+            $avg_x /= $count;
+            $avg_y /= $count;
+        } else {
+            ($avg_x, $avg_y) = $parse_pt->($o[-1]);
+        }
+
+        # Find point in current bucket B_i that maximizes triangle area (A, P,
+        # C)
+        my $max_area = -1;
+        my $max_idx  = $range_start;
+
+        for my $j ($range_start .. $range_end - 1) {
+            my ($px, $py) = $parse_pt->($o[$j]);
+
+            # Triangle area = 0.5 * | xA(yP - yC) + xP(yC - yA) + xC(yA - yP)
+            my $area = abs($ax * ($py - $avg_y) +
+                           $px * ($avg_y - $ay) +
+                           $avg_x * ($ay - $py)) * 0.5;
+
+            if ($area > $max_area) {
+                $max_area = $area;
+                $max_idx  = $j;
+            }
+        }
+
+        # Select point with largest triangle area
+        push @sampled, $o[$max_idx];
+
+        # Set point A to the selected point for the next bucket iteration
+        ($ax, $ay) = $parse_pt->($o[$max_idx]);
+    }
+
+    # 3. Always keep the last point
+    push @sampled, $o[-1];
+
+    # Save reduced dataset
+    open(D, ">$outdir/lt-$filename.csv") or die "Cannot open file: $!";
+    print D @sampled;
+    close(D);
+}
+
+
+sub gencsv {
+    my ($filename, $aref) = @_;
     my $index = 0;
     my $av;
     my @av;
     my $prevc = "";
     my @vals;
     my $bar = "";
+    my @o;
     for my $key (sort keys %$aref) {
         my $commit = $git{$key};
         my $v;
@@ -129,7 +245,8 @@ sub dumpcsv {
         }
         $av = mean(@av);
 
-        printf D "%u;%s;%u;%u;%u;%u;%s\n", $index++, $gitalias{$prevc},
+        push @o,
+            sprintf "%u;%s;%u;%u;%u;%u;%s\n", $index++, $gitalias{$prevc},
             $min, $v, $max, $av, $bar;
         $prevc = $commit;
     }
@@ -142,10 +259,9 @@ sub dumpcsv {
         shift @av;
     }
     $av = mean(@av);
-    printf D "%u;%s;%s;%s;%s;%u;%s\n", $index++, $gitalias{$prevc},
+    push @o, sprintf "%u;%s;%s;%s;%s;%u;%s\n", $index++, $gitalias{$prevc},
         $min, $v, $max, $av, $bar;
-
-    close(D);
+    return @o;
 }
 
 sub gensvg {
@@ -271,16 +387,30 @@ sub show {
 
     my $suffix = int(rand(100000000));
     
-    dumpcsv($filename, \%a);
+    my @o = gencsv($filename, \%a);
+    storelatest($filename, @o);
+    storelttb($filename, @o);
+    
     gensvg($filename, $suffix, $aver);
+    gensvg("lt-$filename", $suffix, $aver);
     genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
 
     print "<details><summary>test description</summary>\n";
     showdocs($filename);
     print "</details>\n";
 
+    print "<h3>Most recent $numlast commits</h3>\n";
     print "<img src=\"$filename-$suffix.svg\">\n";
-    print "<br><img src=\"p-$filename-$suffix.svg\">\n";
+    print "<details><summary>Data distribution</summary>\n";
+    print "<h3>Data distribution</h3>\n";
+    print "<img src=\"p-$filename-$suffix.svg\">\n";
+    print "</details>\n";
+    
+    print "<details><summary>Full range graph</summary>\n";
+    print "<h3>Full range</h3>\n";
+    print "Downsamples the entire set to $numlttb data points.\n";
+    print "<img src=\"lt-$filename-$suffix.svg\">\n";
+    print "</details>\n";
 }
 
 my @curlv;
