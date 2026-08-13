@@ -736,8 +736,8 @@ print <<HEAD
 $numlogs builds analyzed. Last run ended $done (Daniel's local time). This
 page was rendered at $now.
 
+<details><summary>$numcommits commits</summary>
 <p>
-  $numcommits commits.
 
 HEAD
     ;
@@ -745,6 +745,7 @@ HEAD
 for my $c (@inorder) {
     printf "<a href=\"%s/%s\">%s</a>, ", $commitbase, $c, $gitalias{$c};
 }
+print "</details>\n";
 
 my @alltests = ("100G-speed",
                "single-numallocs",
@@ -771,10 +772,12 @@ my @alltests = ("100G-speed",
                "multi-handle",
                "connectdata",
     );
-print "<p> Available tests: ";
+printf "<details><summary>%u tests</summary>\n", scalar(@alltests);
+
 for my $t (@alltests) {
     print "<a href=\"#$t\">$t</a>, ";
 }
+print "</details>\n";
 
 builddetails();
 
