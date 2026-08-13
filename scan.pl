@@ -6,6 +6,7 @@ use Data::Dumper;
 my $logdir = "log";
 my $outdir = "out";
 my $graphplot = "graph.plot";
+my $commitbase = "https://github.com/curl/curl/commit";
 
 opendir(my $dh, $logdir) || die "Can't open dir: $!";
 my @logs = grep { /^perf.*\.log/ && -f "$logdir/$_" } readdir($dh);
@@ -578,7 +579,6 @@ page was rendered at $now.
 HEAD
     ;
 
-my $commitbase = "https://github.com/curl/curl/commit";
 for my $c (@inorder) {
     printf "<a href=\"%s/%s\">%s</a>, ", $commitbase, $c, $gitalias{$c};
 }
