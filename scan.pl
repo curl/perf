@@ -4,7 +4,7 @@ use JSON;
 use Data::Dumper;
 
 my $logdir = "log";
-my $outdir = "out";
+my $outdir = "out2";
 my $graphplot = "graph.plot";
 my $commitbase = "https://github.com/curl/curl/commit";
 
@@ -356,16 +356,40 @@ sub storestakes {
 sub builddetails {
     open(G, "<$outdir/git-hashes") || return;
     my %desc;
+    my %order;
+    my @log;
+    my $age = 0;
     while(<G>) {
         if(/^([^ ]*) (.*)/) {
-            $desc{$1} = $2;
+            my ($hash, $desc) = ($1, $2);
+            push @log, $hash;
+            $desc{$hash} = $desc;
+            if($gitcommits{$hash}) {
+                $order{$hash} = $age;
+                $age++;
+            }
         }
     }
     close(G);
     print "<details><summary>build details</summary>\n";
-    for my $c (@inorder) {
-        printf "<br><a href=\"%s/%s\">%s</a>: %s (%u builds)\n",
-            $commitbase, $c, $gitalias{$c}, $desc{$c}, $gitcommits{$c};
+    my $index;
+
+    my $oldest = $inorder[0];
+    
+    for my $c (@log) {
+        if($gitcommits{$c}) {
+            printf "<br><a href=\"%s/%s\">%s</a> %s (%u builds)\n",
+                $commitbase, $c, $gitalias{$c}, $desc{$c},
+                $gitcommits{$c};
+        }
+        else {
+            printf "<br> plus: <a href=\"%s/%s\">%s</a> %s \n",
+                $commitbase, $c, $c, $desc{$c};
+        }
+        if($c eq $oldest) {
+            # end now
+            last;
+        }
     }
 
     print "</details>\n";
