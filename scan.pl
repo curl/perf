@@ -352,6 +352,25 @@ sub storestakes {
     }
 }
 
+sub builddetails {
+    open(G, "<$outdir/git-hashes") || return;
+    my %desc;
+    while(<G>) {
+        if(/^([^ ]*) (.*)/) {
+            $desc{$1} = $2;
+        }
+    }
+    close(G);
+    print "<details><summary>build details</summary>\n";
+    for my $c (@inorder) {
+        printf "<br><a href=\"%s/%s\">%s</a>: %s (%u builds)\n",
+            $commitbase, $c, $gitalias{$c}, $desc{$c}, $gitcommits{$c};
+    }
+
+    print "</details>\n";
+
+}
+
 # transfer speed bytes/sec
 my $lowspeed = 1000000; # below this value is an error
 # requests/second
@@ -593,6 +612,8 @@ print "<p> Available tests: ";
 for my $t (@alltests) {
     print "<a href=\"#$t\">$t</a>, ";
 }
+
+builddetails();
 
 show("Download speed 100G single transfer HTTP://",
      "higher",
