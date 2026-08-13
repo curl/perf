@@ -4,7 +4,7 @@ use JSON;
 use Data::Dumper;
 
 my $logdir = "log";
-my $outdir = "out2";
+my $outdir = "out";
 my $graphplot = "graph.plot";
 my $commitbase = "https://github.com/curl/curl/commit";
 
