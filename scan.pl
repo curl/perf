@@ -348,8 +348,6 @@ sub show {
     my $bar = $stake{"default", $filename, 'val'};
     print "<h2>$name <a name=\"$filename\" href=\"#$filename\">($filename)</a></h2>";
     print "$which is better, $unit\n";
-    print "<pre>\n";
-    printf "%u samples\n", scalar(values %a);
     $p0 = minimum(values %a);
     $p25 = p25(values %a);
     $p50 = median(values %a);
@@ -358,6 +356,12 @@ sub show {
     $aver = mean(values %a);
     my $std = stddev(values %a);
 
+    my @o = gencsv($filename, \%a);
+    storelatest($filename, @o);
+    storelttb($filename, @o);
+    
+    print "<pre>\n";
+    printf "%u samples, %u commits\n", scalar(values %a), scalar(@o);
     printf "P0:      %s\n", showval($p0);
     printf "P25:     %s\n", showval($p25);
     printf "P50:     %s\n", showval($p50);
@@ -395,10 +399,6 @@ sub show {
     print "</pre>\n";
 
     my $suffix = int(rand(100000000));
-    
-    my @o = gencsv($filename, \%a);
-    storelatest($filename, @o);
-    storelttb($filename, @o);
     
     gensvg($filename, $suffix, $aver);
     gensvg("lt-$filename", $suffix, $aver);
