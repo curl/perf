@@ -190,9 +190,18 @@ sub storelttb {
     # 3. Always keep the last point
     push @sampled, $o[-1];
 
+    # update the index numbers in first column
+    my @u;
+    my $i = 0;
+    for my $s (@sampled) {
+        $s =~ s/^(\d+);//g;
+        push @u, "$i;$s";
+        $i++;
+    }
+
     # Save reduced dataset
     open(D, ">$outdir/lt-$filename.csv") or die "Cannot open file: $!";
-    print D @sampled;
+    print D @u;
     close(D);
 }
 
