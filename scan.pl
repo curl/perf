@@ -527,19 +527,17 @@ sub show {
     print "<h3>Most recent $numlast rounds</h3>\n";
     print "<img src=\"$filename-$suffix.svg\">\n";
     print "<details><summary>Data distribution</summary>\n";
-    print "<h3>Data distribution</h3>\n";
-    print "<img src=\"p-$filename-$suffix.svg\">\n";
+    print "<p><img src=\"p-$filename-$suffix.svg\">\n";
     print "</details>\n";
     
     print "<details><summary>Full range</summary>\n";
-    print "<h3>Full range</h3>\n";
-    print "Downsamples the entire set to $numlttb data points.\n";
+    print "<p>Downsamples the entire set to $numlttb data points.\n";
     print "<img src=\"lt-$filename-$suffix.svg\">\n";
     print "</details>\n";
     if(scalar(@o) > 10) {
         print <<END
 <details><summary>Trend</summary>
-<h3>Trend</h3>
+<p>
  Draws a trend-line for the full range set. The trend is only considered
  statistically significant if the P value is less than 0.05.
 END
