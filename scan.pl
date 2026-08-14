@@ -723,7 +723,7 @@ for my $c (sort keys %git) {
     }
 }
 
-my $numcommits = scalar(keys %gitcommits);
+my $numrounds = scalar(keys %gitcommits);
 
 my $numlogs = scalar(@logs);
 use POSIX qw(strftime);
@@ -736,7 +736,7 @@ print <<HEAD
 $numlogs builds analyzed. Last run ended $done (Daniel's local time). This
 page was rendered at $now.
 
-<details><summary>$numcommits rounds</summary>
+<details><summary>$numrounds rounds</summary>
 <p>
 
 HEAD

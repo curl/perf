@@ -105,7 +105,7 @@ There are three additional plots in the graph:
 
 - *mean* is the mean value taken from all builds in the set
 - *stake* is the predetermined (ideal) value to compare against for this test
-- *moving average* is the mean value of the 4 latest commits' (median)
+- *moving average* is the mean value of the 4 latest rounds' (median)
   values
 
 The leftmost datapoint is the oldest build round. Later ones move to the
