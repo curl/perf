@@ -6,6 +6,7 @@ use Data::Dumper;
 my $logdir = "log";
 my $outdir = "out";
 my $graphplot = "graph.plot";
+my $trendplot = "trend.plot";
 my $commitbase = "https://github.com/curl/curl/commit";
 
 opendir(my $dh, $logdir) || die "Can't open dir: $!";
@@ -192,17 +193,32 @@ sub storelttb {
 
     # update the index numbers in first column
     my @u;
+    my @u2;
     my $i = 0;
+    my @meds;
     for my $s (@sampled) {
-        $s =~ s/^(\d+);//g;
-        push @u, "$i;$s";
+        my @f = split /;/, $s;
+        push @meds, $f[3]; # the median value
+        $s =~ s/^(\d+);//g; # strip the index
+        push @u, "$i;$s"; # add new index
         $i++;
+    }
+
+    # do the Mann-Kendall Test + Sen's Slope
+    my ($p_value, @trend) = mann_kendall_sens_slope(\@meds);
+
+    # append the slope to data set
+    for my $s (@u) {
+        chomp $s;
+        push @u2, sprintf "%s;%s\n", $s, shift @trend;
     }
 
     # Save reduced dataset
     open(D, ">$outdir/lt-$filename.csv") or die "Cannot open file: $!";
-    print D @u;
+    print D @u2;
     close(D);
+
+    return $p_value;
 }
 
 
@@ -278,10 +294,14 @@ sub gensvg {
     system("gnuplot -c $graphplot $outdir/$filename.csv $mean > $outdir/$filename-$suffix.svg");
 }
 
+sub gentrendsvg {
+    my ($filename, $suffix) = @_;
+    system("gnuplot -c $trendplot $outdir/lt-$filename.csv > $outdir/tr-$filename-$suffix.svg");
+}
+
 sub genpercent {
     my ($filename, $suffix, $p0, $p25, $p50, $p75, $p100, $aver) = @_;
     system("gnuplot -c horizontal.plot $p0 $p25 $p50 $p75 $p100 $aver > $outdir/$filename-$suffix.svg");
-
 }
 
 sub deltaopinion {
@@ -340,6 +360,99 @@ sub showdocs {
     close(D);
 }
 
+sub mann_kendall_sens_slope {
+    my ($data_ref) = @_;
+    
+    return undef unless defined $data_ref && @$data_ref >= 2;
+
+    my $n = scalar @$data_ref;
+    my $num_pairs = $n * ($n - 1) / 2;
+
+    my $S = 0;
+    my @slopes;
+    $#slopes = $num_pairs - 1;
+    my $pair_idx = 0;
+
+    # 1. Compute S statistic and collect pairwise slopes
+    for (my $i = 0; $i < $n - 1; $i++) {
+        for (my $j = $i + 1; $j < $n; $j++) {
+            my $diff = $data_ref->[$j] - $data_ref->[$i];
+
+            if    ($diff > 0) { $S += 1; }
+            elsif ($diff < 0) { $S -= 1; }
+
+            $slopes[$pair_idx++] = $diff / ($j - $i);
+        }
+    }
+
+    # 2. Tie correction factor
+    my %tie_counts;
+    $tie_counts{$_}++ for @$data_ref;
+
+    my $tie_correction = 0;
+    while (my ($val, $count) = each %tie_counts) {
+        if ($count > 1) {
+            $tie_correction += $count * ($count - 1) * (2 * $count + 5);
+        }
+    }
+
+    # 3. Variance and Z statistic
+    my $var_S = ($n * ($n - 1) * (2 * $n + 5) - $tie_correction) / 18.0;
+
+    my $Z = 0;
+    if ($var_S > 0) {
+        if    ($S > 0) { $Z = ($S - 1.0) / sqrt($var_S); }
+        elsif ($S < 0) { $Z = ($S + 1.0) / sqrt($var_S); }
+    }
+
+    my $p_value = POSIX::erfc(abs($Z) / sqrt(2.0));
+
+    # 4. Sen's Slope (m)
+    @slopes = sort { $a <=> $b } @slopes;
+
+    my $median_slope;
+    my $mid = int($num_pairs / 2);
+    if ($num_pairs % 2 == 1) {
+        $median_slope = $slopes[$mid];
+    } else {
+        $median_slope = ($slopes[$mid - 1] + $slopes[$mid]) / 2.0;
+    }
+
+    # 5. Calculate Intercept (c) = median(y_i - m * i)
+    my @intercept_candidates;
+    for (my $i = 0; $i < $n; $i++) {
+        push @intercept_candidates, $data_ref->[$i] - ($median_slope * $i);
+    }
+    @intercept_candidates = sort { $a <=> $b } @intercept_candidates;
+
+    my $intercept;
+    my $mid_n = int($n / 2);
+    if ($n % 2 == 1) {
+        $intercept = $intercept_candidates[$mid_n];
+    } else {
+        $intercept = ($intercept_candidates[$mid_n - 1] + $intercept_candidates[$mid_n]) / 2.0;
+    }
+
+    # 6. Generate Y values array for plotting the trend line
+    my @trend_line;
+    for (my $i = 0; $i < $n; $i++) {
+        push @trend_line, sprintf("%.3f", $median_slope * $i + $intercept);
+    }
+
+# A P-value less than 0.05 => "the trend is statistically significant"
+    
+#    return {
+#        S          => $S,
+#        var_S      => $var_S,
+#        Z          => $Z,
+#        p_value    => $p_value,
+#        sens_slope => $median_slope,
+#        intercept  => $intercept,
+#        trend_line => \@trend_line, # Array of Y points corresponding to each X index
+#    };
+    return ($p_value, @trend_line);
+}
+
 sub show {
     my ($name, $which, $filename, $unit, %a) = @_;
 
@@ -358,7 +471,7 @@ sub show {
 
     my @o = gencsv($filename, \%a);
     storelatest($filename, @o);
-    storelttb($filename, @o);
+    my $p_value = storelttb($filename, @o);
     
     print "<pre>\n";
     printf "%u samples, %u rounds\n", scalar(values %a), scalar(@o);
@@ -402,6 +515,9 @@ sub show {
     
     gensvg($filename, $suffix, $aver);
     gensvg("lt-$filename", $suffix, $aver);
+    if(scalar(@o) > 10) {
+        gentrendsvg($filename, $suffix);
+    }
     genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
 
     print "<details><summary>test description</summary>\n";
@@ -415,11 +531,26 @@ sub show {
     print "<img src=\"p-$filename-$suffix.svg\">\n";
     print "</details>\n";
     
-    print "<details><summary>Full range graph</summary>\n";
+    print "<details><summary>Full range</summary>\n";
     print "<h3>Full range</h3>\n";
     print "Downsamples the entire set to $numlttb data points.\n";
     print "<img src=\"lt-$filename-$suffix.svg\">\n";
     print "</details>\n";
+    if(scalar(@o) > 10) {
+        print <<END
+<details><summary>Trend</summary>
+<h3>Trend</h3>
+ Draws a trend-line for the full range set. The trend is only considered
+ statistically significant if the P value is less than 0.05.
+END
+            ;
+            
+        printf "Mann-Kendall says: statistically %s (P: %.4f)\n",
+            $p_value < 0.05 ? "SIGNIFICANT" : "insignificant",
+            $p_value;
+        print "<img src=\"tr-$filename-$suffix.svg\">\n";
+        print "</details>\n";
+    }
 }
 
 my @curlv;
