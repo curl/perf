@@ -98,8 +98,8 @@ may have been done in the same round. The data from all builds in the same
 round is accumulated and the *median*, *minimum* and *maximum* values are put
 into the graph.
 
-As long as the commit does not change when new builds are done, the round
-continues.
+If the latest commit remains the same as the previous one when a new build is
+started, the round continues.
 
 There are three additional plots in the graph:
 
