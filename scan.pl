@@ -116,15 +116,13 @@ sub storelttb {
 
     my $nin = scalar @o;
 
+    my @sampled;
+
     # No downsampling needed if input has fewer or equal entries than requested
     if ($nin <= $numlttb || $numlttb < 3) {
-        open(D, ">$outdir/lt-$filename.csv") or die "Cannot open file: $!";
-        print D @o;
-        close(D);
-        return;
+        @sampled = @o;
+        goto trendit; # skip to the trend line at once
     }
-
-    my @sampled;
 
     # 1. Always keep the first point
     push @sampled, $o[0];
@@ -191,6 +189,8 @@ sub storelttb {
     # 3. Always keep the last point
     push @sampled, $o[-1];
 
+  trendit:
+    
     # update the index numbers in first column
     my @u;
     my @u2;
