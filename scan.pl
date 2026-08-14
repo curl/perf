@@ -862,6 +862,11 @@ my $now = strftime "%Y-%m-%d %H:%M:%S UTC", @now;
 print <<HEAD
 <h1>curl performance tests</h1>
 
+<div style="float: right">
+<a href="https://github.com/curl/perf">curl/perf on GitHub</a>
+</div>
+
+<p>
 $numlogs builds analyzed. Last run ended $done (Daniel's local time). This
 page was rendered at $now.
 
