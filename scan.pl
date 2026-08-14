@@ -361,7 +361,7 @@ sub show {
     storelttb($filename, @o);
     
     print "<pre>\n";
-    printf "%u samples, %u commits\n", scalar(values %a), scalar(@o);
+    printf "%u samples, %u rounds\n", scalar(values %a), scalar(@o);
     printf "P0:      %s\n", showval($p0);
     printf "P25:     %s\n", showval($p25);
     printf "P50:     %s\n", showval($p50);
@@ -408,7 +408,7 @@ sub show {
     showdocs($filename);
     print "</details>\n";
 
-    print "<h3>Most recent $numlast commits</h3>\n";
+    print "<h3>Most recent $numlast rounds</h3>\n";
     print "<img src=\"$filename-$suffix.svg\">\n";
     print "<details><summary>Data distribution</summary>\n";
     print "<h3>Data distribution</h3>\n";
@@ -718,7 +718,7 @@ for my $c (sort keys %git) {
     $gitcommits{$git{$c}}++;
     if($gitcommits{$git{$c}} == 1) {
         push @inorder, $git{$c};
-        $gitalias{$git{$c}} = sprintf("C%u", $short);
+        $gitalias{$git{$c}} = sprintf("R%u", $short);
         $short++;
     }
 }
@@ -736,7 +736,7 @@ print <<HEAD
 $numlogs builds analyzed. Last run ended $done (Daniel's local time). This
 page was rendered at $now.
 
-<details><summary>$numcommits commits</summary>
+<details><summary>$numcommits rounds</summary>
 <p>
 
 HEAD

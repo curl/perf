@@ -93,10 +93,13 @@ compared to the stake.
 
 ## Main data development graph
 
-The graphs gather data from many builds. Several builds may have been done
-based on the same commit. The data from all builds for each commit is
-accumulated and the *median*, *minimum* and *maximum* values are put into the
-graph.
+The graphs gather data from many builds into a single *round*. Several builds
+may have been done in the same round. The data from all builds in the same
+round is accumulated and the *median*, *minimum* and *maximum* values are put
+into the graph.
+
+As long as the commit does not change when new builds are done, the round
+continues.
 
 There are three additional plots in the graph:
 
@@ -105,12 +108,14 @@ There are three additional plots in the graph:
 - *moving average* is the mean value of the 4 latest commits' (median)
   values
 
-The leftmost datapoint is the oldest commit. Later ones move to the right.
+The leftmost datapoint is the oldest build round. Later ones move to the
+right.
 
 The Y axis unit depends on the specific test. Read the description.
 
-The X axis are the different commits. The commits are shown as `C[number]`. At
-the top of the page there are direct links for each commit.
+The X axis are the different rounds. Each build round is shown as `R[number]`.
+At the top of the page there are direct links for the last commit for each
+round, as long as additional details about them.
 
 ## Data distribution graph
 
