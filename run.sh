@@ -14,6 +14,6 @@ echo "runs single.sh $CODE to $LOG"
 ./single.sh $CODE $PERFDIR > log/$LOG
 echo "now make the HTML"
 rm -f out/*
-(cd $CODE && git log --oneline --no-decorate -200) > out/git-hashes
+(cd $CODE && git log --oneline --no-decorate -400) > out/git-hashes
 ./scan.pl > out/index.html
 ./tarballit.sh out perf.tar.gz
