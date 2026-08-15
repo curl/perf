@@ -221,6 +221,25 @@ sub storelttb {
     return $p_value;
 }
 
+# Figure out the median stake per round (commit)
+sub stakepercommit {
+    my ($filename, $aref) = @_;
+    my %sta;
+    my %med;
+    for my $key (sort keys %$aref) {
+        my $commit = $git{$key};
+        my $bar;
+        if($stake{$key, $filename, 'val'}) {
+            # there is a specific stake for this test in this build
+            $bar = $stake{$key, $filename, 'val'};
+        }
+        $sta{$commit} .= "$bar " if($bar);
+    }
+    for my $c(keys %sta) {
+        $med{$c} = median(split(/ /, $sta{$c}));
+    }
+    return %med;
+}
 
 sub gencsv {
     my ($filename, $aref) = @_;
@@ -231,17 +250,15 @@ sub gencsv {
     my @vals;
     my $bar = "";
     my @o;
+
+    my %stakes = stakepercommit($filename, $aref);
+
     for my $key (sort keys %$aref) {
         my $commit = $git{$key};
         my $v;
         my $min;
         my $max;
-        if($stake{$key, $filename, 'val'}) {
-            # there is a specific stake for this test in this build
-            $bar = $stake{$key, $filename, 'val'};
-            # then keep this value, for the last entry or if the next one
-            # would weirdly lack it
-        }
+
         if($commit ne $prevc) {
             if($vals[0]) {
                 $min = minimum(@vals);
@@ -269,6 +286,14 @@ sub gencsv {
             shift @av;
         }
         $av = mean(@av);
+
+        # there is a specific stake for this test in this build
+        $bar = $stakes{$commit};
+
+        if(($bar > 1.2 * $v) || ($bar < 0.8 * $v)) {
+            # bad bar, ignore
+            $bar = "";
+        }
 
         push @o,
             sprintf "%u;%s;%u;%u;%u;%u;%s\n", $index++, $gitalias{$prevc},
