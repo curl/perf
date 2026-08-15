@@ -4,10 +4,11 @@ LOG=`date "+perf-%Y-%m-%d-%H-%M-%S.log"`
 PERFDIR=$HOME/src/curl-perf
 CODE=$HOME/src/curl-perf-code
 
+cd $PERFDIR
+
 echo "update curl/perf"
 git pull --quiet
 
-cd $PERFDIR
 echo "runs single.sh $CODE to $LOG"
 
 ./single.sh $CODE $PERFDIR > log/$LOG
