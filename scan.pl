@@ -915,7 +915,7 @@ print "</details>\n";
 
 builddetails();
 
-show("Download speed 100G single transfer HTTP://",
+show("Download speed single transfer HTTP://",
      "higher",
      "100G-speed",
      "bytes/sec", %h1serial);
@@ -927,75 +927,75 @@ show("Allocated memory for a single HTTP transfer",
      "lower",
      "single-maxalloc",
      "bytes", %maxalloc);
-show("Download speed parallel HTTP/1 (100x500MB)",
+show("Download speed parallel HTTP/1",
      "higher",
      "h1parallel-speed",
      "bytes/sec", %h1p);
-show("Download speed parallel HTTP/2 (100x500MB)",
+show("Download speed parallel HTTP/2",
      "higher",
      "h2parallel-speed",
      "bytes/sec", %h2p);
-show("Download speed parallel HTTP/3 (100x500MB)",
+show("Download speed parallel HTTP/3",
      "higher",
      "h3parallel-speed",
      "bytes/sec", %h3p);
-show("Memory use RSS for parallel HTTP/1 (100x500MB)",
+show("Memory use for parallel HTTP/1",
      "lower",
      "h1parallel-mem",
      "bytes", %h1pbytes);
-show("Memory use RSS for parallel HTTP/2 (100x500MB)",
+show("Memory use for parallel HTTP/2",
      "lower",
      "h2parallel-mem",
      "bytes", %h2pbytes);
-show("Memory use RSS for parallel HTTP/3 (100x500MB)",
+show("Memory use for parallel HTTP/3",
      "lower",
      "h3parallel-mem",
      "bytes", %h3pbytes);
-show("Upload speed parallel HTTP/1 (100x500MB)",
+show("Upload speed parallel HTTP/1",
      "higher",
      "h1parallel-upload-speed",
      "bytes/sec", %h1pu);
-show("Upload speed parallel HTTP/2 (100x500MB)",
+show("Upload speed parallel HTTP/2",
      "higher",
      "h2parallel-upload-speed",
      "bytes/sec", %h2pu);
-show("Upload speed parallel HTTP/3 (100x500MB)",
+show("Upload speed parallel HTTP/3",
      "higher",
      "h3parallel-upload-speed",
      "bytes/sec", %h3pu);
-show("Memory use RSS for parallel upload HTTP/1 (100x500MB)",
+show("Memory use for parallel upload HTTP/1",
      "lower",
      "h1parallel-upload-mem",
      "bytes", %h1pubytes);
-show("Memory use RSS for parallel upload HTTP/2 (100x500MB)",
+show("Memory use for parallel upload HTTP/2",
      "lower",
      "h2parallel-upload-mem",
      "bytes", %h2pubytes);
-show("Memory use RSS for parallel upload HTTP/3 (100x500MB)",
+show("Memory use for parallel upload HTTP/3",
      "lower",
      "h3parallel-upload-mem",
      "bytes", %h3pubytes);
-show("HTTP/1 parallel requests (100000 x 40)",
+show("HTTP/1 parallel requests",
      "higher",
      "h1-requests",
      "requests/sec", %h1r);
-show("HTTP/2 parallel requests (100000 x 40)",
+show("HTTP/2 parallel requests",
      "higher",
      "h2-requests",
      "requests/sec", %h2r);
-show("HTTP/3 parallel requests (100000 x 40)",
+show("HTTP/3 parallel requests",
      "higher",
      "h3-requests",
      "requests/sec", %h3r);
-show("Memory use for HTTP/1 parallel requests (100000 x 40)",
+show("Memory use for HTTP/1 parallel requests",
      "lower",
      "h1-req-mem",
      "bytes", %h1rbytes);
-show("Memory use for HTTP/2 parallel requests (100000 x 40)",
+show("Memory use for HTTP/2 parallel requests",
      "lower",
      "h2-req-mem",
      "bytes", %h2rbytes);
-show("Memory use for HTTP/3 parallel requests (100000 x 40)",
+show("Memory use for HTTP/3 parallel requests",
      "lower",
      "h3-req-mem",
      "bytes", %h3rbytes);
