@@ -331,6 +331,9 @@ sub genpercent {
 
 sub deltaopinion {
     my ($delta, $which) = @_;
+    if($which eq "exact") {
+        return "";
+    }
     if($delta) {
         my $m = $delta;
         if($which eq "lower") {
@@ -345,10 +348,16 @@ sub deltaopinion {
 }
 
 sub showval {
-    my ($val) = @_;
-    my $v = int($val);
+    my ($val, $decimals) = @_;
+    my $v;
+    if(!$decimals) {
+        $v = int($val);
+    }
+    else {
+        $v = sprintf "%.${decimals}f", $val;
+    }
     my $sign = "";
-    if($v < 0) {
+    if($val < 0) {
         $sign = "-";
         $v = -$v;
     }
@@ -478,11 +487,16 @@ sub mann_kendall_sens_slope {
     return ($p_value, @trend_line);
 }
 
+my %unit2dec = (
+    'CPU%' => 3,
+    );
+
 sub show {
     my ($name, $which, $filename, $unit, %a) = @_;
 
     my ($p0, $p25, $p50, $p75, $p100);
     my $aver;
+    my $decimals = $unit2dec{$unit};
     my $bar = $stake{"default", $filename, 'val'};
     print "<h2>$name <a name=\"$filename\" href=\"#$filename\">($filename)</a></h2>";
     print "$which is better, $unit\n";
@@ -500,17 +514,17 @@ sub show {
     
     print "<pre>\n";
     printf "%u samples, %u rounds\n", scalar(values %a), scalar(@o);
-    printf "P0:      %s\n", showval($p0);
-    printf "P25:     %s\n", showval($p25);
-    printf "P50:     %s\n", showval($p50);
-    printf "P75:     %s\n", showval($p75);
-    printf "P100:    %s\n", showval($p100);
-    printf "Mean:    %s\n", showval($aver);
-    printf "Std dev: %s", showval($std);
+    printf "P0:      %s\n", showval($p0, $decimals);
+    printf "P25:     %s\n", showval($p25, $decimals);
+    printf "P50:     %s\n", showval($p50, $decimals);
+    printf "P75:     %s\n", showval($p75, $decimals);
+    printf "P100:    %s\n", showval($p100, $decimals);
+    printf "Mean:    %s\n", showval($aver, $decimals);
+    printf "Std dev: %s", showval($std, $decimals);
     if($aver) {
         printf ", %.2f%% of mean",  $std * 100 / $aver;
     }
-    printf "\nSpan:    +-%s", showval(($p100 - $p0)/2);
+    printf "\nSpan:    +-%s", showval(($p100 - $p0)/2, $decimals);
     if($aver) {
         printf ", %.2f%% of mean", ($p100 - $p0)/2 * 100 / $aver;
     }
@@ -521,15 +535,15 @@ sub show {
         printf "\nStake:   %s %s ('stake' is a set typical value for this test)\n",
             $stake{"default", $filename, 'date'},
             $stake{"default", $filename, 'desc'};
-        printf "         %s\n", showval($bar);
+        printf "         %s\n", showval($bar, $decimals);
         $avdelta = $bar - $aver;
         printf "         %s from mean, (%.2f%%) %s\n",
-            showval($avdelta),
+            showval($avdelta, $decimals),
             ($avdelta * 100) / $aver,
             deltaopinion($avdelta, $which);
         $p50delta = $bar - $p50;
         printf "         %s from P50, (%.2f%%) %s\n",
-            showval($p50delta),
+            showval($p50delta, $decimals),
             ($p50delta * 100) / $p50,
             deltaopinion($p50delta, $which);
     }
@@ -611,6 +625,14 @@ sub scorecard_req {
         $bytes = $$j{'requests'}{'rows'}[0][2]{'stats'}{'rss'};
     }
     return (0+$speed, 0+$bytes);
+}
+
+sub scorecard_limitrate {
+    my (@json) = @_;
+    my $j = decode_json(join("", @json));
+    my $speed = $$j{'downloads'}{'rows'}[0][1]{'val'};
+    my $cpu = $$j{'downloads'}{'rows'}[0][1]{'stats'}{'cpu'};
+    return (0+$speed, 0+$cpu);
 }
 
 sub loadstakes {
@@ -707,6 +729,7 @@ sub single {
     my @h2puj;
     my @h3puj;
     my @stakes;
+    my @h1rate;
     my $git = "";
     my $scan = "";
 
@@ -756,6 +779,9 @@ sub single {
         }
         elsif(/^h3pu:(.*)/) {
             push @h3puj, $1;
+        }
+        elsif(/^h1rate:(.*)/) {
+            push @h1rate, $1;
         }
         elsif(/^git commit: (.*)/) {
             $git{$scan} = $1;
@@ -857,6 +883,13 @@ sub single {
             $h3rbytes{$scan} = $mem;
         }
     }
+    if($h1rate[0]) {
+        my ($speed, $cpu) = scorecard_limitrate(@h1rate);
+        if($speed > 10000) {
+            $h1limitrate{$scan} = $speed;
+            $h1limitcpu{$scan} = $cpu;
+        }
+    }
 }
 
 # Load the current stakes. Each build has its own set.
@@ -907,33 +940,35 @@ for my $c (@inorder) {
 print "</details>\n";
 
 my @alltests = ("100G-speed",
-               "single-numallocs",
-               "single-maxalloc",
-               "h1parallel-speed",
-               "h2parallel-speed",
-               "h3parallel-speed",
-               "h1parallel-mem",
-               "h2parallel-mem",
-               "h3parallel-mem",
-               "h1parallel-upload-speed",
-               "h2parallel-upload-speed",
-               "h3parallel-upload-speed",
-               "h1parallel-upload-mem",
-               "h2parallel-upload-mem",
-               "h3parallel-upload-mem",
-               "h1-requests",
-               "h2-requests",
-               "h3-requests",
-               "h1-req-mem",
-               "h2-req-mem",
-               "h3-req-mem",
-               "easy-handle",
-               "multi-handle",
-               "connectdata",
+                "single-numallocs",
+                "single-maxalloc",
+                "h1parallel-speed",
+                "h2parallel-speed",
+                "h3parallel-speed",
+                "h1parallel-mem",
+                "h2parallel-mem",
+                "h3parallel-mem",
+                "h1parallel-upload-speed",
+                "h2parallel-upload-speed",
+                "h3parallel-upload-speed",
+                "h1parallel-upload-mem",
+                "h2parallel-upload-mem",
+                "h3parallel-upload-mem",
+                "h1-requests",
+                "h2-requests",
+                "h3-requests",
+                "h1-req-mem",
+                "h2-req-mem",
+                "h3-req-mem",
+                "easy-handle",
+                "multi-handle",
+                "connectdata",
+                "h1rate",
+                "h1rate-speed",
     );
 printf "<details><summary>%u tests</summary>\n", scalar(@alltests);
 
-for my $t (@alltests) {
+for my $t (sort @alltests) {
     print "<a href=\"#$t\">$t</a>, ";
 }
 print "</details>\n";
@@ -1036,6 +1071,14 @@ show("connectdata struct size",
      "lower",
      "connectdata",
      "bytes", %connectdata) if %connectdata;
+show("Limit-rate CPU use",
+     "lower",
+     "h1rate-cpu",
+     "CPU%", %h1limitcpu);
+show("Limit-rate network speed",
+     "exact",
+     "h1rate-speed",
+     "bytes/sec", %h1limitrate);
 
 print "<h3> configure</h3>";
 print @confopts;
