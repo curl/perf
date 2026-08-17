@@ -296,7 +296,7 @@ sub gencsv {
         }
 
         push @o,
-            sprintf "%u;%s;%u;%u;%u;%u;%s\n", $index++, $gitalias{$prevc},
+            sprintf "%u;%s;%s;%s;%s;%s;%s\n", $index++, $gitalias{$prevc},
             $min, $v, $max, $av, $bar;
         $prevc = $commit;
     }
@@ -309,7 +309,7 @@ sub gencsv {
         shift @av;
     }
     $av = mean(@av);
-    push @o, sprintf "%u;%s;%s;%s;%s;%u;%s\n", $index++, $gitalias{$prevc},
+    push @o, sprintf "%u;%s;%s;%s;%s;%s;%s\n", $index++, $gitalias{$prevc},
         $min, $v, $max, $av, $bar;
     return @o;
 }
@@ -350,6 +350,10 @@ sub deltaopinion {
 sub showval {
     my ($val, $decimals) = @_;
     my $v;
+    if($val < 0) {
+        $sign = "-";
+        $val = abs($val);
+    }
     if(!$decimals) {
         $v = int($val);
     }
@@ -357,10 +361,6 @@ sub showval {
         $v = sprintf "%.${decimals}f", $val;
     }
     my $sign = "";
-    if($val < 0) {
-        $sign = "-";
-        $v = -$v;
-    }
     if($v < 1000000) {
         # less than a million
         return "$sign$v";
@@ -885,7 +885,7 @@ sub single {
     }
     if($h1rate[0]) {
         my ($speed, $cpu) = scorecard_limitrate(@h1rate);
-        if($speed > 10000) {
+        if($speed > $lowspeed) {
             $h1limitrate{$scan} = $speed;
             $h1limitcpu{$scan} = $cpu;
         }
@@ -963,7 +963,7 @@ my @alltests = ("100G-speed",
                 "easy-handle",
                 "multi-handle",
                 "connectdata",
-                "h1rate",
+                "h1rate-cpu",
                 "h1rate-speed",
     );
 printf "<details><summary>%u tests</summary>\n", scalar(@alltests);
@@ -1074,11 +1074,11 @@ show("connectdata struct size",
 show("Limit-rate CPU use",
      "lower",
      "h1rate-cpu",
-     "CPU%", %h1limitcpu);
+     "CPU%", %h1limitcpu) if %h1limitcpu;
 show("Limit-rate network speed",
      "exact",
      "h1rate-speed",
-     "bytes/sec", %h1limitrate);
+     "bytes/sec", %h1limitrate) if %h1limitrate;
 
 print "<h3> configure</h3>";
 print @confopts;
