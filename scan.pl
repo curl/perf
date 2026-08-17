@@ -559,12 +559,13 @@ sub show {
     }
     genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
 
-    print "<details><summary>test description</summary>\n";
+    print "<h3>Most recent $numlast rounds</h3>\n";
+    print "<img src=\"$filename-$suffix.svg\">\n";
+
+    print "<details><summary>Description</summary>\n";
     showdocs($filename);
     print "</details>\n";
 
-    print "<h3>Most recent $numlast rounds</h3>\n";
-    print "<img src=\"$filename-$suffix.svg\">\n";
     print "<details><summary>Data distribution</summary>\n";
     print "<p><img src=\"p-$filename-$suffix.svg\">\n";
     print "</details>\n";
