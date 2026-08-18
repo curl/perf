@@ -705,7 +705,8 @@ sub builddetails {
     for my $c (@log) {
         my $t = $tag{$c}; # if any
         if($t) {
-            printf "<br>👉️ <a href=\"%s/%s\"><b>$t</b>\n",
+            # Backhand Index Pointing Right Emoji
+            printf "<br>&\#x1F449; <a href=\"%s/%s\"><b>$t</b>\n",
                 $commitbase, $c;
         }
         if($gitcommits{$c}) {
