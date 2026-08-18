@@ -688,12 +688,26 @@ sub builddetails {
         }
     }
     close(G);
+    my %tag;
+    open(G, "<$outdir/git-tags");
+    # 400fffa90f (tag: curl-8_17_0)
+    while(<G>) {
+        if(/^([0-9a-f]+) \(tag: ([^\)]+)/) {
+            $tag{$1} = $2;
+        }
+    }
+    close(G);
     print "<details><summary>$numrounds rounds</summary>\n";
     my $index;
 
     my $oldest = $inorder[0];
     
     for my $c (@log) {
+        my $t = $tag{$c}; # if any
+        if($t) {
+            printf "<br>👉️ <a href=\"%s/%s\"><b>$t</b>\n",
+                $commitbase, $c;
+        }
         if($gitcommits{$c}) {
             printf "<br><a href=\"%s/%s\">%s</a> %s (%u builds)\n",
                 $commitbase, $c, $gitalias{$c}, $desc{$c},
