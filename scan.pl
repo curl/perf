@@ -350,6 +350,7 @@ sub deltaopinion {
 sub showval {
     my ($val, $decimals) = @_;
     my $v;
+    my $sign = "";
     if($val < 0) {
         $sign = "-";
         $val = abs($val);
@@ -360,7 +361,6 @@ sub showval {
     else {
         $v = sprintf "%.${decimals}f", $val;
     }
-    my $sign = "";
     if($v < 1000000) {
         # less than a million
         return "$sign$v";
@@ -670,6 +670,7 @@ sub storestakes {
 }
 
 sub builddetails {
+    my ($numrounds) = @_;
     open(G, "<$outdir/git-hashes") || return;
     my %desc;
     my %order;
@@ -687,7 +688,7 @@ sub builddetails {
         }
     }
     close(G);
-    print "<details><summary>build details</summary>\n";
+    print "<details><summary>$numrounds rounds</summary>\n";
     my $index;
 
     my $oldest = $inorder[0];
@@ -925,20 +926,13 @@ print <<HEAD
 <a href="https://github.com/curl/perf">curl/perf on GitHub</a>
 </div>
 
+<details><summary>$numlogs builds</summary>
 <p>
-$numlogs builds analyzed. Last run ended $done (Daniel's local time). This
-page was rendered at $now.
-
-<details><summary>$numrounds rounds</summary>
-<p>
+Last run ended $done (Daniel's local time). This page was rendered at $now.
+</details>
 
 HEAD
     ;
-
-for my $c (@inorder) {
-    printf "<a href=\"%s/%s\">%s</a>, ", $commitbase, $c, $gitalias{$c};
-}
-print "</details>\n";
 
 my @alltests = ("100G-speed",
                 "single-numallocs",
@@ -974,7 +968,7 @@ for my $t (sort @alltests) {
 }
 print "</details>\n";
 
-builddetails();
+builddetails($numrounds);
 
 show("Download speed single transfer HTTP://",
      "higher",
