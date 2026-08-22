@@ -82,19 +82,36 @@ sub stddev {
     return $sample_std_dev;
 }
 
-# entries to store in the "last N builds" CSV
-my $numlast = 100;
+# entries to store in each CSV
+my $roundspergraph = 100;
 
-sub storelatest {
-    my ($filename, @o) = @_;
+sub writecsv {
+    my ($filename, $begin, $end, $oref) = @_;
+    my $out = 0;
 
-    # This should store only the last N entries
-    while(scalar(@o) > $numlast) {
-        shift @o;
+    if($begin < 0) {
+        $begin = 0;
     }
     open(D, ">$outdir/$filename.csv");
-    print D @o;
+    for my $i ($begin .. $end) {
+        print D $$oref[$i];
+        $out++;
+    }
     close(D);
+    return $out;
+}
+
+# store all data in a number of CSV files
+sub storedata {
+    my ($filename, $oref) = @_;
+    my $csvi = 0;
+    my $n = scalar(@$oref);
+
+    do {
+        writecsv("$csvi-$filename", $n - $roundspergraph, $n - 1, $oref);
+        $n -= $roundspergraph;
+        $csvi++;
+    } while($n > 0);
 }
 
 # entries to store in the LTTB CSV
@@ -322,6 +339,13 @@ sub gencsv {
 }
 
 sub gensvg {
+    my ($filename, $suffix, $mean, $plots) = @_;
+    for (my $i = 0; $i < $plots; $i++) {
+        system("gnuplot -c $graphplot $outdir/$i-$filename.csv $mean > $outdir/$i-$filename-$suffix.svg");
+    }
+}
+
+sub genfullsvg {
     my ($filename, $suffix, $mean) = @_;
     system("gnuplot -c $graphplot $outdir/$filename.csv $mean > $outdir/$filename-$suffix.svg");
 }
@@ -516,7 +540,7 @@ sub show {
     my $std = stddev(values %a);
 
     my @o = gencsv($filename, \%a);
-    storelatest($filename, @o);
+    storedata($filename, \@o);
     my $p_value = storelttb($filename, @o);
     
     print "<pre>\n";
@@ -559,15 +583,45 @@ sub show {
 
     my $suffix = int(rand(100000000));
     
-    gensvg($filename, $suffix, $aver);
-    gensvg("lt-$filename", $suffix, $aver);
+    gensvg($filename, $suffix, $aver, scalar(@o) / $roundspergraph);
+    genfullsvg("lt-$filename", $suffix, $aver);
+
     if(scalar(@o) > 10) {
         gentrendsvg($filename, $suffix);
     }
     genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
 
-    print "<h3>Most recent $numlast rounds</h3>\n";
-    print "<img src=\"$filename-$suffix.svg\">\n";
+    my $f = scalar(@o) - $roundspergraph;
+    if($f < 0) {
+        $f = 0;
+    }
+    my $shows = $roundspergraph;
+    if($shows > scalar(@o)) {
+        $shows = scalar(@o);
+    }
+
+    print "<details open>";
+    printf "<summary>Most recent $shows rounds (R%u - R%u)</summary>\n",
+        $f, scalar(@o) - 1;
+    print "<img src=\"0-$filename-$suffix.svg\">\n";
+
+    if(scalar(@o) > $roundspergraph) {
+        my $n = scalar(@o);
+        my $img = 1;
+        # $i is the last build shown per image
+        for (my $i = scalar(@o) - $roundspergraph - 1; $i >= 0; $i -= $roundspergraph) {
+            my $first = $i - $roundspergraph + 1;
+            if($first < 0) {
+                $first = 0;
+            }
+            printf "<details><summary>Round R%u - R%u</summary>\n",
+                $first, $i;
+            print "<img src=\"$img-$filename-$suffix.svg\">\n";
+            print "</details>\n";
+            $img++;
+        }
+    }
+    print "</details>\n";
 
     print "<details><summary>Description</summary>\n";
     showdocs($filename);
