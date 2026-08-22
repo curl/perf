@@ -340,10 +340,8 @@ sub gencsv {
 
 sub gensvg {
     my ($filename, $suffix, $mean, $plots) = @_;
-    my $i = 0;
-    while($i <= $plots) {
+    for (my $i = 0; $i < $plots; $i++) {
         system("gnuplot -c $graphplot $outdir/$i-$filename.csv $mean > $outdir/$i-$filename-$suffix.svg");
-        $i++;
     }
 }
 
