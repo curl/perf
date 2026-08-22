@@ -607,15 +607,18 @@ sub show {
 
     if(scalar(@o) > $roundspergraph) {
         my $n = scalar(@o);
-        for (my $i = 1; $i <= $n / $roundspergraph; $i++) {
-            my $first = $n - ($i + 1) * $roundspergraph;
+        my $img = 1;
+        # $i is the last build shown per image
+        for (my $i = scalar(@o) - $roundspergraph - 1; $i >= 0; $i -= $roundspergraph) {
+            my $first = $i - $roundspergraph + 1;
             if($first < 0) {
                 $first = 0;
             }
             printf "<details><summary>Round R%u - R%u</summary>\n",
-                $first, $n - $i * $roundspergraph -1;
-            print "<img src=\"$i-$filename-$suffix.svg\">\n";
+                $first, $i;
+            print "<img src=\"$img-$filename-$suffix.svg\">\n";
             print "</details>\n";
+            $img++;
         }
     }
     print "</details>\n";
