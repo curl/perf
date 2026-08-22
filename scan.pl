@@ -378,6 +378,8 @@ sub deltaopinion {
     return "";
 }
 
+my %alltests;
+
 sub showval {
     my ($val, $decimals) = @_;
     my $v;
@@ -528,7 +530,7 @@ sub show {
     my ($name, $which, $filename, $unit, %a) = @_;
 
     my ($p0, $p25, $p50, $p75, $p100);
-    my $aver;
+    my $mean;
     my $decimals = $unit2dec{$unit};
     my $bar = $marker{"default", $filename, 'val'};
     my @out;
@@ -539,7 +541,7 @@ sub show {
     $p50 = median(values %a);
     $p75 = p75(values %a);
     $p100 = maximum(values %a);
-    $aver = mean(values %a);
+    $mean = mean(values %a);
     my $std = stddev(values %a);
 
     my @o = gencsv($filename, \%a);
@@ -553,14 +555,14 @@ sub show {
     push @out, sprintf "P50:     %s\n", showval($p50, $decimals);
     push @out, sprintf "P75:     %s\n", showval($p75, $decimals);
     push @out, sprintf "P100:    %s\n", showval($p100, $decimals);
-    push @out, sprintf "Mean:    %s\n", showval($aver, $decimals);
+    push @out, sprintf "Mean:    %s\n", showval($mean, $decimals);
     push @out, sprintf "Std dev: %s", showval($std, $decimals);
-    if($aver) {
-        push @out, sprintf ", %.2f%% of mean",  $std * 100 / $aver;
+    if($mean) {
+        push @out, sprintf ", %.2f%% of mean",  $std * 100 / $mean;
     }
     push @out, sprintf "\nSpan:    +-%s", showval(($p100 - $p0)/2, $decimals);
-    if($aver) {
-        push @out, sprintf ", %.2f%% of mean", ($p100 - $p0)/2 * 100 / $aver;
+    if($mean) {
+        push @out, sprintf ", %.2f%% of mean", ($p100 - $p0)/2 * 100 / $mean;
     }
     push @out, "\n";
     if($bar) {
@@ -570,29 +572,32 @@ sub show {
             $marker{"default", $filename, 'date'},
             $marker{"default", $filename, 'desc'};
         push @out, sprintf "         %s\n", showval($bar, $decimals);
-        $avdelta = $bar - $aver;
+        $avdelta = $bar - $mean;
         push @out, sprintf "         %s from mean, (%.2f%%) %s\n",
             showval($avdelta, $decimals),
-            ($avdelta * 100) / $aver,
+            ($avdelta * 100) / $mean,
             deltaopinion($avdelta, $which);
         $p50delta = $bar - $p50;
         push @out, sprintf "         %s from P50, (%.2f%%) %s\n",
             showval($p50delta, $decimals),
             ($p50delta * 100) / $p50,
             deltaopinion($p50delta, $which);
+
+        # store the marker diff compared to mean
+        $deltas{$filename} = ($avdelta * 100) / $mean;
     }
 
     push @out, "</pre>\n";
 
     my $suffix = int(rand(100000000));
     
-    gensvg($filename, $suffix, $aver, scalar(@o) / $roundspergraph);
-    genfullsvg("lt-$filename", $suffix, $aver);
+    gensvg($filename, $suffix, $mean, scalar(@o) / $roundspergraph);
+    genfullsvg("lt-$filename", $suffix, $mean);
 
     if(scalar(@o) > 10) {
         gentrendsvg($filename, $suffix);
     }
-    genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$aver);
+    genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$mean);
 
     my $f = scalar(@o) - $roundspergraph;
     if($f < 0) {
@@ -653,6 +658,7 @@ END
         push @out, "<img src=\"tr-$filename-$suffix.svg\">\n";
         push @out, "</details>\n";
     }
+    $alltests{$filename} = $name;
     return @out;
 }
 
@@ -1014,43 +1020,10 @@ Last run ended $done (Daniel's local time). This page was rendered at $now.
 HEAD
     ;
 
-my @alltests = ("100G-speed",
-                "single-numallocs",
-                "single-maxalloc",
-                "h1parallel-speed",
-                "h2parallel-speed",
-                "h3parallel-speed",
-                "h1parallel-mem",
-                "h2parallel-mem",
-                "h3parallel-mem",
-                "h1parallel-upload-speed",
-                "h2parallel-upload-speed",
-                "h3parallel-upload-speed",
-                "h1parallel-upload-mem",
-                "h2parallel-upload-mem",
-                "h3parallel-upload-mem",
-                "h1-requests",
-                "h2-requests",
-                "h3-requests",
-                "h1-req-mem",
-                "h2-req-mem",
-                "h3-req-mem",
-                "easy-handle",
-                "multi-handle",
-                "connectdata",
-                "h1rate-cpu",
-                "h1rate-speed",
-    );
-printf "<details><summary>%u tests</summary>\n", scalar(@alltests);
-
-for my $t (sort @alltests) {
-    print "<a href=\"#$t\">$t</a>, ";
-}
-print "</details>\n";
-
 builddetails($numrounds);
 
 my @output;
+my @deltas;
 
 push @output, show("Download speed single transfer HTTP://",
                    "higher",
@@ -1156,6 +1129,28 @@ push @output, show("Limit-rate network speed",
                    "exact",
                    "h1rate-speed",
                    "bytes/sec", %h1limitrate) if %h1limitrate;
+
+printf "<details><summary>%u tests</summary>\n", scalar(%alltests);
+
+for my $t (sort keys %alltests) {
+    print "<a href=\"#$t\">$t</a>, ";
+}
+print "</details>\n";
+
+print "<details open><summary>Deltas over 0.5% from marker</summary>\n";
+print "<table>\n";
+for my $t (sort {abs($deltas{$b}) <=> abs($deltas{$a})} keys %deltas) {
+    if(abs($deltas{$t}) >= 0.5) {
+        printf "<tr><td>".
+            "<b>%.2f%%</b>".
+            "</td><td>".
+            "<a href=\"#%s\">%s</a>".
+            "</td></tr>\n",
+            $deltas{$t}, $t, $alltests{$t};
+    }
+}
+print "</table>\n";
+print "</details>\n";
 
 print @output;
 
