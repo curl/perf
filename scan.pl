@@ -607,8 +607,7 @@ sub show {
 
     if(scalar(@o) > $roundspergraph) {
         my $n = scalar(@o);
-        my $i = 1;
-        while($i <= $n / $roundspergraph) {
+        for (my $i = 1; $i <= $n / $roundspergraph; $i++) {
             my $first = $n - ($i + 1) * $roundspergraph;
             if($first < 0) {
                 $first = 0;
@@ -617,7 +616,6 @@ sub show {
                 $first, $n - $i * $roundspergraph -1;
             print "<img src=\"$i-$filename-$suffix.svg\">\n";
             print "</details>\n";
-            $i++;
         }
     }
     print "</details>\n";
