@@ -221,17 +221,17 @@ sub storelttb {
     return $p_value;
 }
 
-# Figure out the median stake per round (commit)
-sub stakepercommit {
+# Figure out the median marker per round (commit)
+sub markerpercommit {
     my ($filename, $aref) = @_;
     my %sta;
     my %med;
     for my $key (sort keys %$aref) {
         my $commit = $git{$key};
         my $bar;
-        if($stake{$key, $filename, 'val'}) {
-            # there is a specific stake for this test in this build
-            $bar = $stake{$key, $filename, 'val'};
+        if($marker{$key, $filename, 'val'}) {
+            # there is a specific marker for this test in this build
+            $bar = $marker{$key, $filename, 'val'};
         }
         $sta{$commit} .= "$bar " if($bar);
     }
@@ -251,7 +251,7 @@ sub gencsv {
     my $bar = "";
     my @o;
 
-    my %stakes = stakepercommit($filename, $aref);
+    my %markers = markerpercommit($filename, $aref);
 
     for my $key (sort keys %$aref) {
         my $commit = $git{$key};
@@ -287,8 +287,8 @@ sub gencsv {
         }
         $av = mean(@av);
 
-        # there is a specific stake for this test in this build
-        $bar = $stakes{$commit};
+        # there is a specific marker for this test in this build
+        $bar = $markers{$prevc};
 
         if(($bar > 1.2 * $v) || ($bar < 0.8 * $v)) {
             # bad bar, ignore
@@ -309,6 +309,13 @@ sub gencsv {
         shift @av;
     }
     $av = mean(@av);
+    # there is a specific marker for this test in this build
+    $bar = $markers{$prevc};
+
+    if(($bar > 1.2 * $v) || ($bar < 0.8 * $v)) {
+        # bad bar, ignore
+        $bar = "";
+    }
     push @o, sprintf "%u;%s;%s;%s;%s;%s;%s\n", $index++, $gitalias{$prevc},
         $min, $v, $max, $av, $bar;
     return @o;
@@ -497,7 +504,7 @@ sub show {
     my ($p0, $p25, $p50, $p75, $p100);
     my $aver;
     my $decimals = $unit2dec{$unit};
-    my $bar = $stake{"default", $filename, 'val'};
+    my $bar = $marker{"default", $filename, 'val'};
     print "<h2>$name <a name=\"$filename\" href=\"#$filename\">($filename)</a></h2>";
     print "$which is better, $unit\n";
     $p0 = minimum(values %a);
@@ -532,9 +539,9 @@ sub show {
     if($bar) {
         my $avdelta;
         my $p50delta;
-        printf "\nStake:   %s %s ('stake' is a set typical value for this test)\n",
-            $stake{"default", $filename, 'date'},
-            $stake{"default", $filename, 'desc'};
+        printf "\nMarker:  %s %s ('marker' is a set typical value for this test)\n",
+            $marker{"default", $filename, 'date'},
+            $marker{"default", $filename, 'desc'};
         printf "         %s\n", showval($bar, $decimals);
         $avdelta = $bar - $aver;
         printf "         %s from mean, (%.2f%%) %s\n",
@@ -636,7 +643,7 @@ sub scorecard_limitrate {
     return (0+$speed, 0+$cpu);
 }
 
-sub loadstakes {
+sub loadmarkers {
     my ($file) = @_;
     my $name;
     my $date;
@@ -646,10 +653,10 @@ sub loadstakes {
         die "found no $file";
     my @all = <S>;
     close(S);
-    storestakes("default", @all);
+    storemarkers("default", @all);
 }
 
-sub storestakes {
+sub storemarkers {
     my ($build, @all) = @_;
     for(@all) {
         if(/^ *#/) {
@@ -664,7 +671,7 @@ sub storestakes {
             if($key !~ /^(val|date|desc)/) {
                 die "illegal keyword in $build: $key";
             }
-            $stake{$build, $name, $key} = $val;
+            $marker{$build, $name, $key} = $val;
         }
     }
 }
@@ -745,7 +752,7 @@ sub single {
     my @h1puj;
     my @h2puj;
     my @h3puj;
-    my @stakes;
+    my @markers;
     my @h1rate;
     my $git = "";
     my $scan = "";
@@ -810,7 +817,7 @@ sub single {
             push @confopts, $1;
         }
         elsif(/^stakes: (.*)/) {
-            push @stakes, $1;
+            push @markers, $1;
         }
         elsif(/^structs: (.*)\t(\d+)\t\d*/) {
             my ($struct, $size) = ($1,$2);
@@ -827,8 +834,8 @@ sub single {
     }
     close(F);
 
-    if($stakes[0]) {
-        storestakes($scan, @stakes);
+    if($markers[0]) {
+        storemarkers($scan, @markers);
     }
 
     # Downloads
@@ -909,8 +916,8 @@ sub single {
     }
 }
 
-# Load the current stakes. Each build has its own set.
-loadstakes("stakes.conf");
+# Load the current markers. Each build has its own set.
+loadmarkers("stakes.conf");
 
 for my $l (sort @logs) {
     single("$logdir/$l");
