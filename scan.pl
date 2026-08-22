@@ -410,6 +410,7 @@ sub showdocs {
     my ($test) = @_;
     open(D, "<describe-tests.conf");
     my $m = 0;
+    my @out;
     while(<D>) {
         if($m && /^\[/) {
             # we are done
@@ -419,10 +420,11 @@ sub showdocs {
             $m = 1; # this is us
         }
         elsif($m) {
-            print $_;
+            push @out, $_;
         }
     }
     close(D);
+    return @out;
 }
 
 sub mann_kendall_sens_slope {
@@ -529,8 +531,9 @@ sub show {
     my $aver;
     my $decimals = $unit2dec{$unit};
     my $bar = $marker{"default", $filename, 'val'};
-    print "<h2>$name <a name=\"$filename\" href=\"#$filename\">($filename)</a></h2>";
-    print "$which is better, $unit\n";
+    my @out;
+    push @out, "<h2>$name <a name=\"$filename\" href=\"#$filename\">($filename)</a></h2>";
+    push @out, "$which is better, $unit\n";
     $p0 = minimum(values %a);
     $p25 = p25(values %a);
     $p50 = median(values %a);
@@ -543,43 +546,43 @@ sub show {
     storedata($filename, \@o);
     my $p_value = storelttb($filename, @o);
     
-    print "<pre>\n";
-    printf "%u samples, %u rounds\n", scalar(values %a), scalar(@o);
-    printf "P0:      %s\n", showval($p0, $decimals);
-    printf "P25:     %s\n", showval($p25, $decimals);
-    printf "P50:     %s\n", showval($p50, $decimals);
-    printf "P75:     %s\n", showval($p75, $decimals);
-    printf "P100:    %s\n", showval($p100, $decimals);
-    printf "Mean:    %s\n", showval($aver, $decimals);
-    printf "Std dev: %s", showval($std, $decimals);
+    push @out, "<pre>\n";
+    push @out, sprintf "%u samples, %u rounds\n", scalar(values %a), scalar(@o);
+    push @out, sprintf "P0:      %s\n", showval($p0, $decimals);
+    push @out, sprintf "P25:     %s\n", showval($p25, $decimals);
+    push @out, sprintf "P50:     %s\n", showval($p50, $decimals);
+    push @out, sprintf "P75:     %s\n", showval($p75, $decimals);
+    push @out, sprintf "P100:    %s\n", showval($p100, $decimals);
+    push @out, sprintf "Mean:    %s\n", showval($aver, $decimals);
+    push @out, sprintf "Std dev: %s", showval($std, $decimals);
     if($aver) {
-        printf ", %.2f%% of mean",  $std * 100 / $aver;
+        push @out, sprintf ", %.2f%% of mean",  $std * 100 / $aver;
     }
-    printf "\nSpan:    +-%s", showval(($p100 - $p0)/2, $decimals);
+    push @out, sprintf "\nSpan:    +-%s", showval(($p100 - $p0)/2, $decimals);
     if($aver) {
-        printf ", %.2f%% of mean", ($p100 - $p0)/2 * 100 / $aver;
+        push @out, sprintf ", %.2f%% of mean", ($p100 - $p0)/2 * 100 / $aver;
     }
-    print "\n";
+    push @out, "\n";
     if($bar) {
         my $avdelta;
         my $p50delta;
-        printf "\nMarker:  %s %s ('marker' is a set typical value for this test)\n",
+        push @out, sprintf "\nMarker:  %s %s ('marker' is a set typical value for this test)\n",
             $marker{"default", $filename, 'date'},
             $marker{"default", $filename, 'desc'};
-        printf "         %s\n", showval($bar, $decimals);
+        push @out, sprintf "         %s\n", showval($bar, $decimals);
         $avdelta = $bar - $aver;
-        printf "         %s from mean, (%.2f%%) %s\n",
+        push @out, sprintf "         %s from mean, (%.2f%%) %s\n",
             showval($avdelta, $decimals),
             ($avdelta * 100) / $aver,
             deltaopinion($avdelta, $which);
         $p50delta = $bar - $p50;
-        printf "         %s from P50, (%.2f%%) %s\n",
+        push @out, sprintf "         %s from P50, (%.2f%%) %s\n",
             showval($p50delta, $decimals),
             ($p50delta * 100) / $p50,
             deltaopinion($p50delta, $which);
     }
 
-    print "</pre>\n";
+    push @out, "</pre>\n";
 
     my $suffix = int(rand(100000000));
     
@@ -600,10 +603,10 @@ sub show {
         $shows = scalar(@o);
     }
 
-    print "<details open>";
-    printf "<summary>Most recent $shows rounds (R%u - R%u)</summary>\n",
+    push @out, "<details open>";
+    push @out, sprintf "<summary>Most recent $shows rounds (R%u - R%u)</summary>\n",
         $f, scalar(@o) - 1;
-    print "<img src=\"0-$filename-$suffix.svg\">\n";
+    push @out, "<img src=\"0-$filename-$suffix.svg\">\n";
 
     if(scalar(@o) > $roundspergraph) {
         my $n = scalar(@o);
@@ -614,29 +617,29 @@ sub show {
             if($first < 0) {
                 $first = 0;
             }
-            printf "<details><summary>Round R%u - R%u</summary>\n",
+            push @out, sprintf "<details><summary>Round R%u - R%u</summary>\n",
                 $first, $i;
-            print "<img src=\"$img-$filename-$suffix.svg\">\n";
-            print "</details>\n";
+            push @out, "<img src=\"$img-$filename-$suffix.svg\">\n";
+            push @out, "</details>\n";
             $img++;
         }
     }
-    print "</details>\n";
+    push @out, "</details>\n";
 
-    print "<details><summary>Description</summary>\n";
-    showdocs($filename);
-    print "</details>\n";
+    push @out, "<details><summary>Description</summary>\n";
+    push @out, showdocs($filename);
+    push @out, "</details>\n";
 
-    print "<details><summary>Data distribution</summary>\n";
-    print "<p><img src=\"p-$filename-$suffix.svg\">\n";
-    print "</details>\n";
+    push @out, "<details><summary>Data distribution</summary>\n";
+    push @out, "<p><img src=\"p-$filename-$suffix.svg\">\n";
+    push @out, "</details>\n";
     
-    print "<details><summary>Full range</summary>\n";
-    print "<p>Downsamples the entire set to $numlttb data points.\n";
-    print "<img src=\"lt-$filename-$suffix.svg\">\n";
-    print "</details>\n";
+    push @out, "<details><summary>Full range</summary>\n";
+    push @out, "<p>Downsamples the entire set to $numlttb data points.\n";
+    push @out, "<img src=\"lt-$filename-$suffix.svg\">\n";
+    push @out, "</details>\n";
     if(scalar(@o) > 10) {
-        print <<END
+        push @out, <<END
 <details><summary>Trend</summary>
 <p>
  Draws a trend-line for the full range set. The trend is only considered
@@ -644,12 +647,13 @@ sub show {
 END
             ;
             
-        printf "Mann-Kendall says: statistically %s (P: %.4f)\n",
+        push @out, sprintf "Mann-Kendall says: statistically %s (P: %.4f)\n",
             $p_value < 0.05 ? "SIGNIFICANT" : "insignificant",
             $p_value;
-        print "<img src=\"tr-$filename-$suffix.svg\">\n";
-        print "</details>\n";
+        push @out, "<img src=\"tr-$filename-$suffix.svg\">\n";
+        push @out, "</details>\n";
     }
+    return @out;
 }
 
 my @curlv;
@@ -1046,110 +1050,114 @@ print "</details>\n";
 
 builddetails($numrounds);
 
-show("Download speed single transfer HTTP://",
-     "higher",
-     "100G-speed",
-     "bytes/sec", %h1serial);
-show("Allocations for a single HTTP transfer",
-     "lower",
-     "single-numallocs",
-     "allocs", %allocations);
-show("Allocated memory for a single HTTP transfer",
-     "lower",
-     "single-maxalloc",
-     "bytes", %maxalloc);
-show("Download speed parallel HTTP/1",
-     "higher",
-     "h1parallel-speed",
-     "bytes/sec", %h1p);
-show("Download speed parallel HTTP/2",
-     "higher",
-     "h2parallel-speed",
-     "bytes/sec", %h2p);
-show("Download speed parallel HTTP/3",
-     "higher",
-     "h3parallel-speed",
-     "bytes/sec", %h3p);
-show("Memory use for parallel HTTP/1",
-     "lower",
-     "h1parallel-mem",
-     "bytes", %h1pbytes);
-show("Memory use for parallel HTTP/2",
-     "lower",
-     "h2parallel-mem",
-     "bytes", %h2pbytes);
-show("Memory use for parallel HTTP/3",
-     "lower",
-     "h3parallel-mem",
-     "bytes", %h3pbytes);
-show("Upload speed parallel HTTP/1",
-     "higher",
-     "h1parallel-upload-speed",
-     "bytes/sec", %h1pu);
-show("Upload speed parallel HTTP/2",
-     "higher",
-     "h2parallel-upload-speed",
-     "bytes/sec", %h2pu);
-show("Upload speed parallel HTTP/3",
-     "higher",
-     "h3parallel-upload-speed",
-     "bytes/sec", %h3pu);
-show("Memory use for parallel upload HTTP/1",
-     "lower",
-     "h1parallel-upload-mem",
-     "bytes", %h1pubytes);
-show("Memory use for parallel upload HTTP/2",
-     "lower",
-     "h2parallel-upload-mem",
-     "bytes", %h2pubytes);
-show("Memory use for parallel upload HTTP/3",
-     "lower",
-     "h3parallel-upload-mem",
-     "bytes", %h3pubytes);
-show("HTTP/1 parallel requests",
-     "higher",
-     "h1-requests",
-     "requests/sec", %h1r);
-show("HTTP/2 parallel requests",
-     "higher",
-     "h2-requests",
-     "requests/sec", %h2r);
-show("HTTP/3 parallel requests",
-     "higher",
-     "h3-requests",
-     "requests/sec", %h3r);
-show("Memory use for HTTP/1 parallel requests",
-     "lower",
-     "h1-req-mem",
-     "bytes", %h1rbytes);
-show("Memory use for HTTP/2 parallel requests",
-     "lower",
-     "h2-req-mem",
-     "bytes", %h2rbytes);
-show("Memory use for HTTP/3 parallel requests",
-     "lower",
-     "h3-req-mem",
-     "bytes", %h3rbytes);
-show("Curl_easy struct size",
-     "lower",
-     "easy-handle",
-     "bytes", %curleasy) if %curleasy;
-show("Curl_multi struct size",
-     "lower",
-     "multi-handle",
-     "bytes", %curlmulti) if %curlmulti;
-show("connectdata struct size",
-     "lower",
-     "connectdata",
-     "bytes", %connectdata) if %connectdata;
-show("Limit-rate CPU use",
-     "lower",
-     "h1rate-cpu",
-     "CPU%", %h1limitcpu) if %h1limitcpu;
-show("Limit-rate network speed",
-     "exact",
-     "h1rate-speed",
-     "bytes/sec", %h1limitrate) if %h1limitrate;
+my @output;
+
+push @output, show("Download speed single transfer HTTP://",
+                   "higher",
+                   "100G-speed",
+                   "bytes/sec", %h1serial);
+push @output, show("Allocations for a single HTTP transfer",
+                   "lower",
+                   "single-numallocs",
+                   "allocs", %allocations);
+push @output, show("Allocated memory for a single HTTP transfer",
+                   "lower",
+                   "single-maxalloc",
+                   "bytes", %maxalloc);
+push @output, show("Download speed parallel HTTP/1",
+                   "higher",
+                   "h1parallel-speed",
+                   "bytes/sec", %h1p);
+push @output, show("Download speed parallel HTTP/2",
+                   "higher",
+                   "h2parallel-speed",
+                   "bytes/sec", %h2p);
+push @output, show("Download speed parallel HTTP/3",
+                   "higher",
+                   "h3parallel-speed",
+                   "bytes/sec", %h3p);
+push @output, show("Memory use for parallel HTTP/1",
+                   "lower",
+                   "h1parallel-mem",
+                   "bytes", %h1pbytes);
+push @output, show("Memory use for parallel HTTP/2",
+                   "lower",
+                   "h2parallel-mem",
+                   "bytes", %h2pbytes);
+push @output, show("Memory use for parallel HTTP/3",
+                   "lower",
+                   "h3parallel-mem",
+                   "bytes", %h3pbytes);
+push @output, show("Upload speed parallel HTTP/1",
+                   "higher",
+                   "h1parallel-upload-speed",
+                   "bytes/sec", %h1pu);
+push @output, show("Upload speed parallel HTTP/2",
+                   "higher",
+                   "h2parallel-upload-speed",
+                   "bytes/sec", %h2pu);
+push @output, show("Upload speed parallel HTTP/3",
+                   "higher",
+                   "h3parallel-upload-speed",
+                   "bytes/sec", %h3pu);
+push @output, show("Memory use for parallel upload HTTP/1",
+                   "lower",
+                   "h1parallel-upload-mem",
+                   "bytes", %h1pubytes);
+push @output, show("Memory use for parallel upload HTTP/2",
+                   "lower",
+                   "h2parallel-upload-mem",
+                   "bytes", %h2pubytes);
+push @output, show("Memory use for parallel upload HTTP/3",
+                   "lower",
+                   "h3parallel-upload-mem",
+                   "bytes", %h3pubytes);
+push @output, show("HTTP/1 parallel requests",
+                   "higher",
+                   "h1-requests",
+                   "requests/sec", %h1r);
+push @output, show("HTTP/2 parallel requests",
+                   "higher",
+                   "h2-requests",
+                   "requests/sec", %h2r);
+push @output, show("HTTP/3 parallel requests",
+                   "higher",
+                   "h3-requests",
+                   "requests/sec", %h3r);
+push @output, show("Memory use for HTTP/1 parallel requests",
+                   "lower",
+                   "h1-req-mem",
+                   "bytes", %h1rbytes);
+push @output, show("Memory use for HTTP/2 parallel requests",
+                   "lower",
+                   "h2-req-mem",
+                   "bytes", %h2rbytes);
+push @output, show("Memory use for HTTP/3 parallel requests",
+                   "lower",
+                   "h3-req-mem",
+                   "bytes", %h3rbytes);
+push @output, show("Curl_easy struct size",
+                   "lower",
+                   "easy-handle",
+                   "bytes", %curleasy) if %curleasy;
+push @output, show("Curl_multi struct size",
+                   "lower",
+                   "multi-handle",
+                   "bytes", %curlmulti) if %curlmulti;
+push @output, show("connectdata struct size",
+                   "lower",
+                   "connectdata",
+                   "bytes", %connectdata) if %connectdata;
+push @output, show("Limit-rate CPU use",
+                   "lower",
+                   "h1rate-cpu",
+                   "CPU%", %h1limitcpu) if %h1limitcpu;
+push @output, show("Limit-rate network speed",
+                   "exact",
+                   "h1rate-speed",
+                   "bytes/sec", %h1limitrate) if %h1limitrate;
+
+print @output;
 
 print "<h3> configure</h3>";
 print @confopts;
