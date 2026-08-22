@@ -604,7 +604,7 @@ sub show {
     }
 
     push @out, "<details open>";
-    push @out, sprintf "<summary>Most recent $shows rounds (R%u - R%u)</summary>\n",
+    push @out, sprintf "<summary>Most recent $shows rounds</summary>\n",
         $f, scalar(@o) - 1;
     push @out, "<img src=\"0-$filename-$suffix.svg\">\n";
 
@@ -617,8 +617,8 @@ sub show {
             if($first < 0) {
                 $first = 0;
             }
-            push @out, sprintf "<details><summary>Round R%u - R%u</summary>\n",
-                $first, $i;
+            push @out, sprintf "<details><summary>Round %u - %u (of %u)</summary>\n",
+                $first, $i, scalar(@o);
             push @out, "<img src=\"$img-$filename-$suffix.svg\">\n";
             push @out, "</details>\n";
             $img++;
