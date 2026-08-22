@@ -22,7 +22,7 @@ set style line 2 linecolor rgb '#e41a1c' linetype 2 linewidth 2 dashtype 2
 # Style for the moving mean
 set style line 3 linecolor rgb '#4060a0' linetype 1 linewidth 2 dashtype 3
 
-# Style for the stake
+# Style for the marker
 set style line 4 linecolor rgb '#a0a000' linetype 1 linewidth 2 dashtype 4
 
 set grid
@@ -42,7 +42,7 @@ set format y "%.2s %c"
 
 set datafile separator ";"
 plot ARG1 using 1:6 with lines linestyle 3 title "moving average", \
-     ARG1 using 1:7 with lines linestyle 4 title "stake", \
+     ARG1 using 1:7 with lines linestyle 4 title "marker", \
      ARG2 + 0 with lines linestyle 2 title "mean", \
      ARG1 using 1:3 with lines linestyle 5 title "min", \
      ARG1 using 1:5 with lines linestyle 6 title "max", \

@@ -40,12 +40,12 @@ git clone the curl source into a directory dedicated for this purpose.
 Make sure `run.sh` can be invoked from a cronjob. Edit it to call `single.sh`
 with the correct paths.
 
-## Stakes
+## Markers
 
-The *stakes* as set in `stakes.conf` are highly machine and build specific so
+The *markers* set in `stakes.conf` are highly machine and build specific so
 they should be set to suitable values per environment.
 
-The stakes are embedded into each build log, so updates should not affect past
+The markers are embedded into each build log, so updates should not affect past
 runs.
 
 # Data
@@ -74,20 +74,20 @@ Then follows a little table:
 
 To help us use performance testing over time, where we might *gradually* slow
 down or speed up or we might reset the logs and need to start over, we have
-set "ideal" or "typical" values for each test. They are called **stakes**.
-Stakes are set manually based on previous runs. They might need to get
+set "ideal" or "typical" values for each test. They are called **markers**.
+Markers are set manually based on previous runs. They might need to get
 adjusted as we change code and alter conditions.
 
-Each stake has a date field and a comment, they are shown.
-Then the stake is displayed.
+Each marker has a date field and a comment, they are shown.
+Then the marker is displayed.
 
-A *delta* from the stake to the *mean* is shown and a helper that explains
+A *delta* from the marker to the *mean* is shown and a helper that explains
 if the delta shows the current mean as better or worse compared to the
-stake.
+marker.
 
-A second *delta* from the stake to the *median* (P50) is shown and a helper
+A second *delta* from the marker to the *median* (P50) is shown and a helper
 that explains if the delta shows the current median as better or worse
-compared to the stake.
+compared to the marker.
 
 # Graphs
 
@@ -104,7 +104,7 @@ started, the round continues.
 There are three additional plots in the graph:
 
 - *mean* is the mean value taken from all builds in the set
-- *stake* is the predetermined (ideal) value to compare against for this test
+- *marker* is the predetermined (ideal) value to compare against for this test
 - *moving average* is the mean value of the 4 latest rounds' (median)
   values
 
