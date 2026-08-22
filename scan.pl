@@ -86,7 +86,7 @@ sub stddev {
 my $roundspergraph = 100;
 
 sub writecsv {
-    my ($filename, $begin, $end, @o) = @_;
+    my ($filename, $begin, $end, $oref) = @_;
     my $out = 0;
 
     if($begin < 0) {
@@ -94,7 +94,7 @@ sub writecsv {
     }
     open(D, ">$outdir/$filename.csv");
     for my $i ($begin .. $end) {
-        print D $o[$i];
+        print D $$oref[$i];
         $out++;
     }
     close(D);
@@ -108,7 +108,7 @@ sub storedata {
     my $n = scalar(@o);
 
     do {
-        writecsv("$csvi-$filename", $n - $roundspergraph, $n - 1, @o);
+        writecsv("$csvi-$filename", $n - $roundspergraph, $n - 1, \@o);
         $n -= $roundspergraph;
         $csvi++;
     } while($n > 0);
