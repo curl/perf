@@ -9,6 +9,15 @@ my $graphplot = "graph.plot";
 my $trendplot = "trend.plot";
 my $commitbase = "https://github.com/curl/curl/commit";
 
+# entries to store in each CSV
+my $roundspergraph = 100;
+
+# Show deltas at the top when average this many percent diff vs marker
+my $deltathreshold = 0.7;
+
+# Use these many values for the moving average
+my $movingaverage = 4;
+
 opendir(my $dh, $logdir) || die "Can't open dir: $!";
 my @logs = grep { /^perf.*\.log/ && -f "$logdir/$_" } readdir($dh);
 closedir $dh;
@@ -81,9 +90,6 @@ sub stddev {
     my $sample_std_dev = sqrt($sqsum / ($count - 1));
     return $sample_std_dev;
 }
-
-# entries to store in each CSV
-my $roundspergraph = 100;
 
 sub writecsv {
     my ($filename, $begin, $end, $oref) = @_;
@@ -299,7 +305,7 @@ sub gencsv {
         }
 
         push @av, $v;
-        if(scalar(@av) > 4) {
+        if(scalar(@av) > $movingaverage) {
             shift @av;
         }
         $av = mean(@av);
@@ -322,7 +328,7 @@ sub gencsv {
     $v = median(@vals);
     $max = maximum(@vals);
     push @av, $v;
-    if(scalar(@av) > 4) {
+    if(scalar(@av) > $movingaverage) {
         shift @av;
     }
     $av = mean(@av);
@@ -1137,20 +1143,27 @@ for my $t (sort keys %alltests) {
 }
 print "</details>\n";
 
-print "<details open><summary>Deltas over 0.5% from marker</summary>\n";
-print "<table>\n";
+my @d;
+
 for my $t (sort {abs($deltas{$b}) <=> abs($deltas{$a})} keys %deltas) {
-    if(abs($deltas{$t}) >= 0.5) {
-        printf "<tr><td>".
+    if(abs($deltas{$t}) >= $deltathreshold) {
+        push @d, sprintf "<tr><td>".
             "<b>%.2f%%</b>".
             "</td><td>".
-            "<a href=\"#%s\">%s</a>".
+            "<a href=\"#%s\">%s</a> marker is %s average".
             "</td></tr>\n",
-            $deltas{$t}, $t, $alltests{$t};
+            $deltas{$t}, $t, $alltests{$t},
+            $deltas{$t} < 0 ? "under" : "over";
     }
 }
-print "</table>\n";
-print "</details>\n";
+if(@d) {
+    printf "<details open><summary>%u deltas over $deltathreshold%% from marker</summary>\n",
+        scalar(@d);
+    print "<table>\n";
+    print @d;
+    print "</table>\n";
+    print "</details>\n";
+}
 
 print @output;
 
