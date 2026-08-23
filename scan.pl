@@ -12,7 +12,7 @@ my $commitbase = "https://github.com/curl/curl/commit";
 # entries to store in each CSV
 my $roundspergraph = 100;
 
-# Show deltas at the top when average this many percent diff vs marker
+# Show deltas at the top when mean is this many percent diff vs marker
 my $deltathreshold = 0.7;
 
 # Use these many values for the moving average
@@ -128,11 +128,11 @@ sub storelttb {
     my ($filename, @o) = @_;
 
     # Helper to parse (X, Y) from a CSV row
-    # Row format: index;name;minimum;median;maximum;average;bar
+    # Row format: index;name;minimum;median;maximum;mean;bar
     my $parse_pt = sub {
         my ($line) = @_;
         my @f = split /;/, $line;
-        # X = index (col 0), Y = average (col 5) or median (col 3)
+        # X = index (col 0), Y = mean (col 5) or median (col 3)
         my $x = defined $f[0] ? $f[0] + 0 : 0;
         my $y = defined $f[5] && $f[5] ne '' ? $f[5] + 0 : ($f[3] // 0) + 0;
         return ($x, $y);
@@ -1153,7 +1153,7 @@ for my $t (sort {abs($deltas{$b}) <=> abs($deltas{$a})} keys %deltas) {
         push @d, sprintf "<tr><td>".
             "<b>%.2f%%</b>".
             "</td><td>".
-            "<a href=\"#%s\">%s</a> marker is %s average".
+            "<a href=\"#%s\">%s</a> marker is %s mean".
             "</td></tr>\n",
             $deltas{$t}, $t, $alltests{$t},
             $deltas{$t} < 0 ? "under" : "over";
