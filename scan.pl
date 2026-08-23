@@ -18,6 +18,9 @@ my $deltathreshold = 0.7;
 # Use these many values for the moving average
 my $movingaverage = 4;
 
+# number of entries to store in the "full range" LTTB CSV file
+my $numlttb = 20;
+
 opendir(my $dh, $logdir) || die "Can't open dir: $!";
 my @logs = grep { /^perf.*\.log/ && -f "$logdir/$_" } readdir($dh);
 closedir $dh;
@@ -120,9 +123,6 @@ sub storedata {
         $csvi++;
     } while($n > 0);
 }
-
-# entries to store in the LTTB CSV
-my $numlttb = 20;
 
 sub storelttb {
     my ($filename, @o) = @_;
@@ -599,7 +599,9 @@ sub show {
     my $suffix = int(rand(100000000));
     
     gensvg($filename, $suffix, $mean, scalar(@o) / $roundspergraph);
-    genfullsvg("lt-$filename", $suffix, $mean);
+    if(scalar(@o) > $roundspergraph) {
+        genfullsvg("lt-$filename", $suffix, $mean);
+    }
 
     if(scalar(@o) > 10) {
         gentrendsvg($filename, $suffix);
@@ -647,11 +649,13 @@ sub show {
     push @out, "<details><summary>Data distribution</summary>\n";
     push @out, "<p><img src=\"p-$filename-$suffix.svg\">\n";
     push @out, "</details>\n";
-    
-    push @out, "<details><summary>Full range</summary>\n";
-    push @out, "<p>Downsamples the entire set to $numlttb data points.\n";
-    push @out, "<img src=\"lt-$filename-$suffix.svg\">\n";
-    push @out, "</details>\n";
+
+    if(scalar(@o) > $roundspergraph) {
+        push @out, "<details><summary>Full range</summary>\n";
+        push @out, "<p>Downsamples the entire set to $numlttb data points.\n";
+        push @out, "<img src=\"lt-$filename-$suffix.svg\">\n";
+        push @out, "</details>\n";
+    }
     if(scalar(@o) > 10) {
         push @out, <<END
 <details><summary>Trend</summary>
