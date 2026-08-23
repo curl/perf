@@ -96,6 +96,7 @@ sub writecsv {
     my $out = 0;
 
     if($begin < 0) {
+        $end -= $begin;
         $begin = 0;
     }
     open(D, ">$outdir/$filename.csv");
@@ -625,11 +626,13 @@ sub show {
         # $i is the last build shown per image
         for (my $i = scalar(@o) - $roundspergraph - 1; $i >= 0; $i -= $roundspergraph) {
             my $first = $i - $roundspergraph + 1;
+            my $end = $i;
             if($first < 0) {
+                $end -= $first;
                 $first = 0;
             }
             push @out, sprintf "<details><summary>Round %u - %u (of %u)</summary>\n",
-                $first, $i, scalar(@o);
+                $first, $end, scalar(@o);
             push @out, "<img src=\"$img-$filename-$suffix.svg\">\n";
             push @out, "</details>\n";
             $img++;
