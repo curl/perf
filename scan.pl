@@ -571,6 +571,9 @@ sub show {
     if($mean) {
         my $mdiff = $movingav - $mean;
         push @out, sprintf ", %.2f%% from mean",  $mdiff * 100 / $mean;
+
+        $mdeltas{$filename} = sprintf "%.2f;%.2f",
+            $mdiff * 100 / $mean, $std * 100 / $mean;
     }
     push @out, sprintf "\nStd dev: %s", showval($std, $decimals);
     if($mean) {
@@ -1159,6 +1162,7 @@ for my $t (sort keys %alltests) {
 }
 print "</details>\n";
 
+# show deltas marker vs mean value
 my @d;
 
 for my $t (sort {abs($deltas{$b}) <=> abs($deltas{$a})} keys %deltas) {
@@ -1174,6 +1178,29 @@ for my $t (sort {abs($deltas{$b}) <=> abs($deltas{$a})} keys %deltas) {
 }
 if(@d) {
     printf "<details open><summary>%u deltas over $deltathreshold%% from marker</summary>\n",
+        scalar(@d);
+    print "<table>\n";
+    print @d;
+    print "</table>\n";
+    print "</details>\n";
+}
+
+# show deltas moving average vs std dev
+undef @d;
+
+for my $t (sort keys %mdeltas) {
+    my ($mav, $std) = split(/;/, $mdeltas{$t});
+    if(abs($mav) > $std * 2) {
+        push @d, sprintf "<tr><td>".
+            "<b>%.2f%%</b>".
+            "</td><td>".
+            "<a href=\"#%s\">%s</a> is larger than std dev %.2f%%".
+            "</td></tr>\n",
+            $mav, $t, $alltests{$t}, $std;
+    }
+}
+if(@d) {
+    printf "<details open><summary>%u moving averages to watch</summary>\n",
         scalar(@d);
     print "<table>\n";
     print @d;
