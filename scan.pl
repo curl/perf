@@ -554,6 +554,10 @@ sub show {
     my @o = gencsv($filename, \%a);
     storedata($filename, \@o);
     my $p_value = storelttb($filename, @o);
+
+    # the last moving average value
+    my @last = split(/;/, $o[-1]);
+    my $movingav = $last[5];
     
     push @out, "<pre>\n";
     push @out, sprintf "%u samples, %u rounds\n", scalar(values %a), scalar(@o);
@@ -563,7 +567,12 @@ sub show {
     push @out, sprintf "P75:     %s\n", showval($p75, $decimals);
     push @out, sprintf "P100:    %s\n", showval($p100, $decimals);
     push @out, sprintf "Mean:    %s\n", showval($mean, $decimals);
-    push @out, sprintf "Std dev: %s", showval($std, $decimals);
+    push @out, sprintf "Moving:  %s", showval($movingav, $decimals);
+    if($mean) {
+        my $mdiff = $movingav - $mean;
+        push @out, sprintf ", %.2f%% from mean",  $mdiff * 100 / $mean;
+    }
+    push @out, sprintf "\nStd dev: %s", showval($std, $decimals);
     if($mean) {
         push @out, sprintf ", %.2f%% of mean",  $std * 100 / $mean;
     }
