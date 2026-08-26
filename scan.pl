@@ -19,7 +19,7 @@ my $deltathreshold = 0.7;
 my $movingaverage = 4;
 
 # number of entries to store in the "full range" LTTB CSV file
-my $numlttb = 20;
+my $numlttb = 100;
 
 opendir(my $dh, $logdir) || die "Can't open dir: $!";
 my @logs = grep { /^perf.*\.log/ && -f "$logdir/$_" } readdir($dh);
