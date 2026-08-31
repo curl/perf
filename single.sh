@@ -89,7 +89,7 @@ date "$PREF ----- snprintf -----"
 ./tests/perf/perf snprintf | sed 's/^/snprintf: /'
 
 date "$PREF ----- URL parser -----"
-./tests/perf/perf urlparser 2500 | 's/^/urlparser: /'
+./tests/perf/perf urlparser 2500 | sed 's/^/urlparser: /'
 
 # Remember the markers when this ran
 cat $PERFDIR/stakes.conf | sed 's/^/stakes: /'
