@@ -86,7 +86,10 @@ date "$PREF ----- base64 functions -----"
 ./tests/perf/perf base64 |  sed 's/^/b64: /'
 
 date "$PREF ----- snprintf -----"
-./tests/perf/perf snprintf |  sed 's/^/snprintf: /'
+./tests/perf/perf snprintf | sed 's/^/snprintf: /'
+
+date "$PREF ----- URL parser -----"
+./tests/perf/perf urlparser 2500 | 's/^/urlparser: /'
 
 # Remember the markers when this ran
 cat $PERFDIR/stakes.conf | sed 's/^/stakes: /'
