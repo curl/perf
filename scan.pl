@@ -829,6 +829,8 @@ my $lowspeed = 1000000; # below this value is an error
 # requests/second
 my $lowreq = 1000; # below this value is an error
 
+my $firststamp;
+
 sub single {
     my ($log) = @_;
     open(F, "<$log") || return;
@@ -853,6 +855,7 @@ sub single {
     while(<F>) {
         if(!$scan && /^(.*) git pull/) {
             $scan = $1;
+            $firststamp = $scan if(!$firststamp);
         }
         elsif(/^(.*) done\n/) {
             $done = $1;
@@ -1030,6 +1033,10 @@ use POSIX qw(strftime);
 my @now = gmtime;
 my $now = strftime "%Y-%m-%d %H:%M:%S UTC", @now;
 
+# in number of days:
+my $buildperiod= sprintf "%.1f",
+    (`date -d "$done" +%s` - `date -d "$firststamp" +%s`) / (3600 * 24);
+
 print <<HEAD
 <h1>curl performance tests</h1>
 
@@ -1038,8 +1045,12 @@ print <<HEAD
 </div>
 
 <details><summary>$numlogs builds</summary>
-<p>
-Last run ended $done (Daniel's local time). This page was rendered at $now.
+<table>
+<tr><td>First</td><td>$firststamp (local time)</td></tr>
+<tr><td>Last</td><td>$done (local time)</td></tr>
+<tr><td>Period</td><td>$buildperiod days</td></tr>
+<tr><td>Rendered</td><td>$now</td></tr>
+</table>
 </details>
 
 HEAD
