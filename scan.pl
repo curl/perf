@@ -873,6 +873,9 @@ sub single {
         elsif(/^b64: Time\/loop: ([0-9.]+) ns/) {
             $b64{$scan} = $1;
         }
+        elsif(/^urlparser: Time\/URL: ([0-9.]+) ns/) {
+            $urlparser{$scan} = $1;
+        }
         elsif(/^snprintf: Time\/loop: ([0-9.]+) ns/) {
             $snprintf{$scan} = $1;
         }
@@ -1180,6 +1183,10 @@ push @output, show("snprintf",
                    "lower",
                    "snprintf",
                    "nanoseconds", %snprintf) if %snprintf;
+push @output, show("URL parsing",
+                   "lower",
+                   "urlparser",
+                   "nanoseconds", %urlparser) if %urlparser;
 
 printf "<details><summary>%u tests</summary>\n", scalar(%alltests);
 
