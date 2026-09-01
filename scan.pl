@@ -869,6 +869,9 @@ sub single {
         elsif(/^mem: Allocations: ([0-9.]+)/) {
             $allocations{$scan} = $1;
         }
+        elsif(/^b64: Time\/loop: ([0-9.]+) ns/) {
+            $b64{$scan} = $1;
+        }
         elsif(/^h1p:(.*)/) {
             push @h1pj, $1; # json
         }
@@ -1165,6 +1168,10 @@ push @output, show("Limit-rate network speed",
                    "exact",
                    "h1rate-speed",
                    "bytes/sec", %h1limitrate) if %h1limitrate;
+push @output, show("base64 encoding-decoding",
+                   "lower",
+                   "b64",
+                   "nanoseconds", %b64) if %b64;
 
 printf "<details><summary>%u tests</summary>\n", scalar(%alltests);
 
