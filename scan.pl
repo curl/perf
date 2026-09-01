@@ -531,6 +531,7 @@ sub mann_kendall_sens_slope {
 
 my %unit2dec = (
     'CPU%' => 3,
+    'nanoseconds' => 2,
     );
 
 sub show {
