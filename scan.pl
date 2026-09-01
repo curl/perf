@@ -873,6 +873,9 @@ sub single {
         elsif(/^b64: Time\/loop: ([0-9.]+) ns/) {
             $b64{$scan} = $1;
         }
+        elsif(/^snprintf: Time\/loop: ([0-9.]+) ns/) {
+            $snprintf{$scan} = $1;
+        }
         elsif(/^h1p:(.*)/) {
             push @h1pj, $1; # json
         }
@@ -1173,6 +1176,10 @@ push @output, show("base64 encoding-decoding",
                    "lower",
                    "b64",
                    "nanoseconds", %b64) if %b64;
+push @output, show("snprintf",
+                   "lower",
+                   "snprintf",
+                   "nanoseconds", %snprintf) if %snprintf;
 
 printf "<details><summary>%u tests</summary>\n", scalar(%alltests);
 
