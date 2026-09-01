@@ -91,6 +91,9 @@ date "$PREF ----- snprintf -----"
 date "$PREF ----- URL parser -----"
 ./tests/perf/perf urlparser 2500 | sed 's/^/urlparser: /'
 
+date "$PREF ----- URL encoding -----"
+./tests/perf/perf percent | sed 's/^/urlencode: /'
+
 # Remember the markers when this ran
 cat $PERFDIR/stakes.conf | sed 's/^/stakes: /'
 date "$PREF done"
