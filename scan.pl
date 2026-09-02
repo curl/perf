@@ -870,8 +870,11 @@ sub single {
         elsif(/^mem: Allocations: ([0-9.]+)/) {
             $allocations{$scan} = $1;
         }
-        elsif(/^b64: Time\/loop: ([0-9.]+) ns/) {
-            $b64{$scan} = $1;
+        elsif(/^b64enc: Time\/loop: ([0-9.]+) ns/) {
+            $b64enc{$scan} = $1;
+        }
+        elsif(/^b64dec: Time\/loop: ([0-9.]+) ns/) {
+            $b64dec{$scan} = $1;
         }
         elsif(/^urlparser: Time\/URL: ([0-9.]+) ns/) {
             $urlparser{$scan} = $1;
@@ -1178,10 +1181,14 @@ push @output, show("Limit-rate network speed",
                    "exact",
                    "h1rate-speed",
                    "bytes/sec", %h1limitrate) if %h1limitrate;
-push @output, show("base64 encoding-decoding",
+push @output, show("base64 encoding",
                    "lower",
-                   "b64",
-                   "nanoseconds", %b64) if %b64;
+                   "b64enc",
+                   "nanoseconds", %b64enc) if %b64enc;
+push @output, show("base64 decoding",
+                   "lower",
+                   "b64dec",
+                   "nanoseconds", %b64dec) if %b64dec;
 push @output, show("snprintf",
                    "lower",
                    "snprintf",
