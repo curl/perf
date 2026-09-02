@@ -82,9 +82,6 @@ pahole lib/.libs/libcurl.a -C Curl_easy,Curl_multi,connectdata -s | sed 's/^/str
 date "$PREF ----- limit-rate -----"
 python3 tests/http/scorecard.py -d --download-count=20 --download-parallel=20 --download-sizes=100mb --limit-rate 5000K --json h1 | sed 's/^/h1rate: /'
 
-date "$PREF ----- base64 functions -----"
-./tests/perf/perf base64 |  sed 's/^/b64: /'
-
 date "$PREF ----- snprintf -----"
 ./tests/perf/perf snprintf | sed 's/^/snprintf: /'
 
