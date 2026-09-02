@@ -882,8 +882,11 @@ sub single {
         elsif(/^snprintf: Time\/loop: ([0-9.]+) ns/) {
             $snprintf{$scan} = $1;
         }
-        elsif(/^urlencode: Time\/loop: ([0-9.]+) ns/) {
-            $urlencode{$scan} = $1;
+        elsif(/^urlenc: Time\/loop: ([0-9.]+) ns/) {
+            $urlenc{$scan} = $1;
+        }
+        elsif(/^urldec: Time\/loop: ([0-9.]+) ns/) {
+            $urldec{$scan} = $1;
         }
         elsif(/^h1p:(.*)/) {
             push @h1pj, $1; # json
@@ -1197,10 +1200,14 @@ push @output, show("URL parsing",
                    "lower",
                    "urlparser",
                    "nanoseconds", %urlparser) if %urlparser;
-push @output, show("URL encode-decode",
+push @output, show("URL encode",
                    "lower",
                    "urlencode",
-                   "nanoseconds", %urlencode) if %urlencode;
+                   "nanoseconds", %urlenc) if %urlenc;
+push @output, show("URL decode",
+                   "lower",
+                   "urldecode",
+                   "nanoseconds", %urldec) if %urldec;
 
 printf "<details><summary>%u tests</summary>\n", scalar(%alltests);
 
