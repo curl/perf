@@ -812,8 +812,8 @@ sub builddetails {
                 $gitcommits{$c};
         }
         else {
-            printf "<br> plus: <a href=\"%s/%s\">%s</a> %s \n",
-                $commitbase, $c, $c, $desc{$c};
+            printf "<br> <a href=\"%s/%s\">&#x1F517;</a> %s \n",
+                $commitbase, $c, $desc{$c};
         }
         if($c eq $oldest) {
             # end now
