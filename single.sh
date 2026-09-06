@@ -91,6 +91,12 @@ date "$PREF ----- base64 decode -----"
 date "$PREF ----- snprintf -----"
 ./tests/perf/perf snprintf | sed 's/^/snprintf: /'
 
+date "$PREF ----- maprintf -----"
+./tests/perf/perf maprintf | sed 's/^/maprintf: /'
+
+date "$PREF ----- simplef -----"
+./tests/perf/perf simpleformat | sed 's/^/simplef: /'
+
 date "$PREF ----- URL parser -----"
 ./tests/perf/perf urlparser 2500 | sed 's/^/urlparser: /'
 
