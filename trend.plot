@@ -26,5 +26,5 @@ set ytics out font ",24" nomirror
 set format y "%.2s %c"
 
 set datafile separator ";"
-plot ARG1 using 1:8 with lines linestyle 2 title "trend", \
+plot ARG1 using 1:9 with lines linestyle 2 title "trend", \
      ARG1 using 1:4:xticlabel(2) with linespoints linestyle 1 title "value"

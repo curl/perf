@@ -289,6 +289,7 @@ sub gencsv {
                 $min = minimum(@vals);
                 $v = median(@vals);
                 $max = maximum(@vals);
+                push @allv, @vals;
                 undef @vals;
                 push @vals, $aref->{$key};
             }
@@ -307,7 +308,6 @@ sub gencsv {
         }
 
         push @movingav, $v;
-        push @allv, $v;
         if(scalar(@movingav) > $movingaverage) {
             shift @movingav;
         }
@@ -331,7 +331,6 @@ sub gencsv {
     $v = median(@vals);
     $max = maximum(@vals);
     push @movingav, $v;
-    push @allv, $v;
     if(scalar(@movingav) > $movingaverage) {
         shift @movingav;
     }
