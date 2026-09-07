@@ -10,7 +10,7 @@ PREF="+%F %T"
 
 cd "$CODE"
 
-date "$PREF git pull"
+date "$PREF git pull (in $CODE)"
 git pull >git.log 2>&1
 
 date "$PREF git describe"
@@ -22,19 +22,13 @@ autoreconf -fi >autoreconf.log 2>&1
 date "$PREF make clean"
 make clean >makeclean.log 2>&1
 
-date "$PREF configure"
+date "$PREF configure debug"
 CONFOPTS="--disable-shared --enable-debug --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --prefix=$HOME/test-curl-install --with-openssl --with-ngtcp2 --with-nghttp3 --with-libssh2 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-ssls-export --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --with-backtrace --enable-ntlm --enable-smb --enable-proxy-http3 --enable-httpsig"
 ./configure $CONFOPTS >configure.log 2>&1
 echo "confopts: $CONFOPTS";
 
 date "$PREF make"
 make -sj20 >make.log 2>&1
-
-date "$PREF make -C tests"
-make -C tests -sj20 >maketests.log 2>&1
-
-date "$PREF curl -V"
-./src/curl -V 2>&1 | sed 's/^/curl-V: /'
 
 date "$PREF download 512 MB"
 export CURL_MEMDEBUG=curlmem.log
@@ -45,6 +39,24 @@ date "$PREF ----- 512 MB download -----"
 perl -Itests ./tests/memanalyze.pl -v $CURL_MEMDEBUG | sed 's/^/mem: /'
 
 unset CURL_MEMDEBUG
+
+date "$PREF make clean again"
+make clean >makeclean.log 2>&1
+
+date "$PREF configure non-debug"
+RELOPTS="--enable-unity --disable-shared --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --with-openssl --with-ngtcp2 --with-nghttp3 --with-libssh2 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-ssls-export --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --with-backtrace --enable-ntlm --enable-smb --enable-proxy-http3 --enable-httpsig"
+
+./configure $RELOPTS >>configure.log 2>&1
+echo "confopts: $RELOPTS";
+
+date "$PREF make non-debug"
+make V=1 -sj20 >>make.log 2>&1
+
+date "$PREF make -C tests"
+make -C tests -sj20 >maketests.log 2>&1
+
+date "$PREF curl -V"
+./src/curl -V 2>&1 | sed 's/^/curl-V: /'
 
 date "$PREF ----- 100G download -----"
 ./src/curl -s localhost/100G -w 'bytes/sec: %{speed_download}\ntotal time: %{time_total}\n' --out-null | sed 's/^/100G: /'
