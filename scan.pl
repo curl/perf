@@ -268,8 +268,9 @@ sub markerpercommit {
 sub gencsv {
     my ($filename, $aref) = @_;
     my $index = 0;
-    my $av;
-    my @av;
+    my $movingav;
+    my @movingav;
+    my @allv;
     my $prevc = "";
     my @vals;
     my $bar = "";
@@ -288,6 +289,7 @@ sub gencsv {
                 $min = minimum(@vals);
                 $v = median(@vals);
                 $max = maximum(@vals);
+                push @allv, @vals;
                 undef @vals;
                 push @vals, $aref->{$key};
             }
@@ -305,11 +307,11 @@ sub gencsv {
             next;
         }
 
-        push @av, $v;
-        if(scalar(@av) > $movingaverage) {
-            shift @av;
+        push @movingav, $v;
+        if(scalar(@movingav) > $movingaverage) {
+            shift @movingav;
         }
-        $av = mean(@av);
+        $movingav = mean(@movingav);
 
         # there is a specific marker for this test in this build
         $bar = $markers{$prevc};
@@ -320,19 +322,19 @@ sub gencsv {
         }
 
         push @o,
-            sprintf "%u;%s;%s;%s;%s;%s;%s\n", $index++, $gitalias{$prevc},
-            $min, $v, $max, $av, $bar;
+            sprintf "%u;%s;%s;%s;%s;%s;%s;%.2f\n", $index++, $gitalias{$prevc},
+            $min, $v, $max, $movingav, $bar, mean(@allv);
         $prevc = $commit;
     }
 
     $min = minimum(@vals);
     $v = median(@vals);
     $max = maximum(@vals);
-    push @av, $v;
-    if(scalar(@av) > $movingaverage) {
-        shift @av;
+    push @movingav, $v;
+    if(scalar(@movingav) > $movingaverage) {
+        shift @movingav;
     }
-    $av = mean(@av);
+    $movingav = mean(@movingav);
     # there is a specific marker for this test in this build
     $bar = $markers{$prevc};
 
@@ -340,21 +342,21 @@ sub gencsv {
         # bad bar, ignore
         $bar = "";
     }
-    push @o, sprintf "%u;%s;%s;%s;%s;%s;%s\n", $index++, $gitalias{$prevc},
-        $min, $v, $max, $av, $bar;
+    push @o, sprintf "%u;%s;%s;%s;%s;%s;%s;%.2f\n", $index++, $gitalias{$prevc},
+        $min, $v, $max, $movingav, $bar, mean(@allv);
     return @o;
 }
 
 sub gensvg {
-    my ($filename, $suffix, $mean, $plots) = @_;
+    my ($filename, $suffix, $plots) = @_;
     for (my $i = 0; $i < $plots; $i++) {
-        system("gnuplot -c $graphplot $outdir/$i-$filename.csv $mean > $outdir/$i-$filename-$suffix.svg");
+        system("gnuplot -c $graphplot $outdir/$i-$filename.csv > $outdir/$i-$filename-$suffix.svg");
     }
 }
 
 sub genfullsvg {
-    my ($filename, $suffix, $mean) = @_;
-    system("gnuplot -c $graphplot $outdir/$filename.csv $mean > $outdir/$filename-$suffix.svg");
+    my ($filename, $suffix) = @_;
+    system("gnuplot -c $graphplot $outdir/$filename.csv > $outdir/$filename-$suffix.svg");
 }
 
 sub gentrendsvg {
@@ -608,9 +610,9 @@ sub show {
 
     my $suffix = int(rand(100000000));
     
-    gensvg($filename, $suffix, $mean, scalar(@o) / $roundspergraph);
+    gensvg($filename, $suffix, scalar(@o) / $roundspergraph);
     if(scalar(@o) > $roundspergraph) {
-        genfullsvg("lt-$filename", $suffix, $mean);
+        genfullsvg("lt-$filename", $suffix);
     }
 
     if(scalar(@o) > 10) {
