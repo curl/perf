@@ -1236,7 +1236,7 @@ for my $t (sort keys %mdeltas) {
         push @d, sprintf "<tr><td>".
             "<b>%.2f%%</b>".
             "</td><td>".
-            "<a href=\"#%s\">%s</a> is larger than std dev %.2f%%".
+            "<a href=\"#%s\">%s</a> delta is larger than double std dev (%.2f%%)".
             "</td></tr>\n",
             $mav, $t, $alltests{$t}, $std;
     }
