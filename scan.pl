@@ -882,6 +882,12 @@ sub single {
         elsif(/^snprintf: Time\/loop: ([0-9.]+) ns/) {
             $snprintf{$scan} = $1;
         }
+        elsif(/^maprintf: Time\/loop: ([0-9.]+) ns/) {
+            $maprintf{$scan} = $1;
+        }
+        elsif(/^simplef: Time\/loop: ([0-9.]+) ns/) {
+            $simplef{$scan} = $1;
+        }
         elsif(/^urlenc: Time\/loop: ([0-9.]+) ns/) {
             $urlenc{$scan} = $1;
         }
@@ -1196,6 +1202,14 @@ push @output, show("snprintf",
                    "lower",
                    "snprintf",
                    "nanoseconds", %snprintf) if %snprintf;
+push @output, show("maprintf",
+                   "lower",
+                   "maprintf",
+                   "nanoseconds", %maprintf) if %maprintf;
+push @output, show("simple printf",
+                   "lower",
+                   "simplef",
+                   "nanoseconds", %simplef) if %simplef;
 push @output, show("URL parsing",
                    "lower",
                    "urlparser",
