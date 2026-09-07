@@ -602,9 +602,6 @@ sub show {
             showval($p50delta, $decimals),
             ($p50delta * 100) / $p50,
             deltaopinion($p50delta, $which);
-
-        # store the marker diff compared to mean
-        $deltas{$filename} = ($avdelta * 100) / $mean;
     }
 
     push @out, "</pre>\n";
@@ -1230,32 +1227,9 @@ for my $t (sort keys %alltests) {
 }
 print "</details>\n";
 
-# show deltas marker vs mean value
-my @d;
-
-for my $t (sort {abs($deltas{$b}) <=> abs($deltas{$a})} keys %deltas) {
-    if(abs($deltas{$t}) >= $deltathreshold) {
-        push @d, sprintf "<tr><td>".
-            "<b>%.2f%%</b>".
-            "</td><td>".
-            "<a href=\"#%s\">%s</a> marker is %s mean".
-            "</td></tr>\n",
-            $deltas{$t}, $t, $alltests{$t},
-            $deltas{$t} < 0 ? "under" : "over";
-    }
-}
-if(@d) {
-    printf "<details open><summary>%u deltas over $deltathreshold%% from marker</summary>\n",
-        scalar(@d);
-    print "<table>\n";
-    print @d;
-    print "</table>\n";
-    print "</details>\n";
-}
-
 # show deltas moving average vs std dev
-undef @d;
 
+my @d;
 for my $t (sort keys %mdeltas) {
     my ($mav, $std) = split(/;/, $mdeltas{$t});
     if(abs($mav) > $std * 2) {
