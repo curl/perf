@@ -16,7 +16,7 @@ my $roundspergraph = 100;
 my $deltathreshold = 0.7;
 
 # Use these many values for the moving average
-my $movingaverage = 10;
+my $movingaverage = 25;
 
 # number of entries to store in the "full range" LTTB CSV file
 my $numlttb = 100;
