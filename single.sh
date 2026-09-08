@@ -39,6 +39,9 @@ perl -Itests ./tests/memanalyze.pl -v $CURL_MEMDEBUG | sed 's/^/mem: /'
 
 unset CURL_MEMDEBUG
 
+date "$PREF ----- struct sizes -----"
+pahole lib/.libs/libcurl.a -C Curl_easy,Curl_multi,connectdata -s | sed 's/^/structs: /'
+
 date "$PREF make clean again"
 make clean >makeclean.log 2>&1
 
@@ -86,9 +89,6 @@ python3 tests/http/scorecard.py -r --request-count=100000 --request-parallel=40 
 
 date "$PREF ----- h3 requests -----"
 python3 tests/http/scorecard.py -r --request-count=100000 --request-parallel=40 --json h3 | sed 's/^/h3req: /'
-
-date "$PREF ----- struct sizes -----"
-pahole lib/.libs/libcurl.a -C Curl_easy,Curl_multi,connectdata -s | sed 's/^/structs: /'
 
 date "$PREF ----- limit-rate -----"
 python3 tests/http/scorecard.py -d --download-count=20 --download-parallel=20 --download-sizes=100mb --limit-rate 5000K --json h1 | sed 's/^/h1rate: /'
