@@ -1280,7 +1280,7 @@ push @output, show("URL decode",
                    "urldecode",
                    "nanoseconds", %urldec) if %urldec;
 
-printf "<details><summary>%u tests</summary>\n", scalar(%alltests);
+printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 
 for my $t (sort keys %alltests) {
     print "<a href=\"#$t\">$t</a>, ";
