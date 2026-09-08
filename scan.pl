@@ -695,11 +695,12 @@ sub scorecard_dldata {
     my $j = decode_json(join("", @json));
     my $speed = $$j{'downloads'}{'rows'}[0][1]{'val'};
     my $bytes = $$j{'downloads'}{'rows'}[0][1]{'stats'}{'rss-max'};
+    my $cpu = $$j{'downloads'}{'rows'}[0][1]{'stats'}{'cpu'};
     if(!$bytes) {
         # try the old
         $bytes = $$j{'downloads'}{'rows'}[0][1]{'stats'}{'rss'};
     }
-    return (0+$speed, 0+$bytes);
+    return (0+$speed, 0+$bytes, 0+$cpu);
 }
 
 sub scorecard_uldata {
@@ -707,10 +708,11 @@ sub scorecard_uldata {
     my $j = decode_json(join("", @json));
     my $speed = $$j{'uploads'}{'rows'}[0][1]{'val'};
     my $bytes = $$j{'uploads'}{'rows'}[0][1]{'stats'}{'rss-max'};
+    my $cpu = $$j{'uploads'}{'rows'}[0][1]{'stats'}{'cpu'};
     if(!$bytes) {
         $bytes = $$j{'uploads'}{'rows'}[0][1]{'stats'}{'rss'};
     }
-    return (0+$speed, 0+$bytes);
+    return (0+$speed, 0+$bytes, 0+$cpu);
 }
 
 sub scorecard_req {
@@ -718,10 +720,11 @@ sub scorecard_req {
     my $j = decode_json(join("", @json));
     my $speed = $$j{'requests'}{'rows'}[0][2]{'val'};
     my $bytes = $$j{'requests'}{'rows'}[0][2]{'stats'}{'rss-max'};
+    my $cpu = $$j{'requests'}{'rows'}[0][2]{'stats'}{'cpu'};
     if(!$bytes) {
         $bytes = $$j{'requests'}{'rows'}[0][2]{'stats'}{'rss'};
     }
-    return (0+$speed, 0+$bytes);
+    return (0+$speed, 0+$bytes, 0+$cpu);
 }
 
 sub scorecard_limitrate {
@@ -956,71 +959,80 @@ sub single {
 
     # Downloads
     if($h1pj[0]) {
-        my ($speed, $mem) = scorecard_dldata(@h1pj);
+        my ($speed, $mem, $cpu) = scorecard_dldata(@h1pj);
         if($speed > $lowspeed) {
             $h1p{$scan} = $speed;
             $h1pbytes{$scan} = $mem;
+            $h1pcpu{$scan} = $cpu;
         }
     }
     if($h2pj[0]) {
-        my ($speed, $mem) = scorecard_dldata(@h2pj);
+        my ($speed, $mem, $cpu) = scorecard_dldata(@h2pj);
         if($speed > $lowspeed) {
             $h2p{$scan} = $speed;
             $h2pbytes{$scan} = $mem;
+            $h2pcpu{$scan} = $cpu;
         }
     }
     if($h3pj[0]) {
-        my ($speed, $mem) = scorecard_dldata(@h3pj);
+        my ($speed, $mem, $cpu) = scorecard_dldata(@h3pj);
         if($speed > $lowspeed) {
             $h3p{$scan} = $speed;
             $h3pbytes{$scan} = $mem;
+            $h3pcpu{$scan} = $cpu;
         }
     }
 
     # Uploads
     if($h1puj[0]) {
-        my ($speed, $mem) = scorecard_uldata(@h1puj);
+        my ($speed, $mem, $cpu) = scorecard_uldata(@h1puj);
         if($speed > $lowspeed) {
             $h1pu{$scan} = $speed;
             $h1pubytes{$scan} = $mem;
+            $h1pucpu{$scan} = $cpu;
         }
     }
 
     if($h2puj[0]) {
-        my ($speed, $mem) = scorecard_uldata(@h2puj);
+        my ($speed, $mem, $cpu) = scorecard_uldata(@h2puj);
         if($speed > $lowspeed) {
             $h2pu{$scan} = $speed;
             $h2pubytes{$scan} = $mem;
+            $h2pucpu{$scan} = $cpu;
         }
     }
 
     if($h3puj[0]) {
-        my ($speed, $mem) = scorecard_uldata(@h3puj);
+        my ($speed, $mem, $cpu) = scorecard_uldata(@h3puj);
         if($speed > $lowspeed) {
             $h3pu{$scan} = $speed;
             $h3pubytes{$scan} = $mem;
+            $h3pucpu{$scan} = $cpu;
         }
     }
     # Requests
     if($h1rj[0]) {
-        my ($speed, $mem) = scorecard_req(@h1rj);
+        my ($speed, $mem, $cpu) = scorecard_req(@h1rj);
         if($speed > $lowreq) {
             $h1r{$scan} = $speed;
             $h1rbytes{$scan} = $mem;
+            $h1rcpu{$scan} = $cpu;
         }
     }
     if($h2rj[0]) {
-        my ($speed, $mem) = scorecard_req(@h2rj);
+        my ($speed, $mem, $cpu) = scorecard_req(@h2rj);
         if($speed > $lowreq) {
             $h2r{$scan} = $speed;
             $h2rbytes{$scan} = $mem;
+            $h2rcpu{$scan} = $cpu;
         }
     }
     if($h3rj[0]) {
-        my ($speed, $mem) = scorecard_req(@h3rj);
+        my ($speed, $mem, $cpu) = scorecard_req(@h3rj);
         if($speed > $lowreq) {
             $h3r{$scan} = $speed;
             $h3rbytes{$scan} = $mem;
+            $h3rcpu{$scan} = $cpu;
         }
     }
     if($h1rate[0]) {
@@ -1097,6 +1109,7 @@ push @output, show("Allocated memory for a single HTTP transfer",
                    "lower",
                    "single-maxalloc",
                    "bytes", %maxalloc);
+
 push @output, show("Download speed parallel HTTP/1",
                    "higher",
                    "h1parallel-speed",
@@ -1109,6 +1122,7 @@ push @output, show("Download speed parallel HTTP/3",
                    "higher",
                    "h3parallel-speed",
                    "bytes/sec", %h3p);
+
 push @output, show("Memory use for parallel HTTP/1",
                    "lower",
                    "h1parallel-mem",
@@ -1121,6 +1135,20 @@ push @output, show("Memory use for parallel HTTP/3",
                    "lower",
                    "h3parallel-mem",
                    "bytes", %h3pbytes);
+
+push @output, show("CPU use for parallel HTTP/1",
+                   "higher",
+                   "h1parallel-cpu",
+                   "CPU%", %h1pcpu);
+push @output, show("CPU use for parallel HTTP/2",
+                   "higher",
+                   "h2parallel-cpu",
+                   "CPU%", %h2pcpu);
+push @output, show("CPU use for parallel HTTP/3",
+                   "higher",
+                   "h3parallel-cpu",
+                   "CPU%", %h3pcpu);
+
 push @output, show("Upload speed parallel HTTP/1",
                    "higher",
                    "h1parallel-upload-speed",
@@ -1133,6 +1161,7 @@ push @output, show("Upload speed parallel HTTP/3",
                    "higher",
                    "h3parallel-upload-speed",
                    "bytes/sec", %h3pu);
+
 push @output, show("Memory use for parallel upload HTTP/1",
                    "lower",
                    "h1parallel-upload-mem",
@@ -1145,6 +1174,20 @@ push @output, show("Memory use for parallel upload HTTP/3",
                    "lower",
                    "h3parallel-upload-mem",
                    "bytes", %h3pubytes);
+
+push @output, show("CPU use for parallel upload HTTP/1",
+                   "higher",
+                   "h1parallel-upload-cpu",
+                   "CPU%", %h1pucpu);
+push @output, show("CPU use for parallel upload HTTP/2",
+                   "higher",
+                   "h2parallel-upload-cpu",
+                   "CPU%", %h2pucpu);
+push @output, show("CPU use for parallel upload HTTP/3",
+                   "higher",
+                   "h3parallel-upload-cpu",
+                   "CPU%", %h3pucpu);
+
 push @output, show("HTTP/1 parallel requests",
                    "higher",
                    "h1-requests",
@@ -1157,6 +1200,7 @@ push @output, show("HTTP/3 parallel requests",
                    "higher",
                    "h3-requests",
                    "requests/sec", %h3r);
+
 push @output, show("Memory use for HTTP/1 parallel requests",
                    "lower",
                    "h1-req-mem",
@@ -1169,6 +1213,20 @@ push @output, show("Memory use for HTTP/3 parallel requests",
                    "lower",
                    "h3-req-mem",
                    "bytes", %h3rbytes);
+
+push @output, show("CPU use for HTTP/1 parallel requests",
+                   "higher",
+                   "h1-req-cpu",
+                   "CPU%", %h1rcpu);
+push @output, show("CPU use for HTTP/2 parallel requests",
+                   "higher",
+                   "h2-req-cpu",
+                   "CPU%", %h2rcpu);
+push @output, show("CPU use for HTTP/3 parallel requests",
+                   "higher",
+                   "h3-req-cpu",
+                   "CPU%", %h3rcpu);
+
 push @output, show("Curl_easy struct size",
                    "lower",
                    "easy-handle",
