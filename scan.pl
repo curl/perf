@@ -21,6 +21,44 @@ my $movingaverage = 25;
 # number of entries to store in the "full range" LTTB CSV file
 my $numlttb = 100;
 
+# generate grouped pages with a set of graphs
+my %groups = (
+    'h1parallel-speed' => 'http1,speed',
+    'h1parallel-mem' => 'http1,mem',
+    'h1parallel-cpu' => 'http1,cpu',
+    'h1parallel-upload-speed' => 'http1,speed',
+    'h1parallel-upload-mem' => 'http1,mem',
+    'h1parallel-upload-cpu' => 'http1,cpu',
+    'h1-requests' => 'http1,parallel',
+    'h1-req-mem' => 'http1,mem',
+    'h1-req-cpu' => 'http1,cpu',
+
+    'h2parallel-speed' => 'http2,speed',
+    'h2parallel-mem' => 'http2,mem',
+    'h2parallel-cpu' => 'http2,cpu',
+    'h2parallel-upload-speed' => 'http2,speed',
+    'h2parallel-upload-mem' => 'http2,mem',
+    'h2parallel-upload-cpu' => 'http2,cpu',
+    'h2-requests' => 'http2,parallel',
+    'h2-req-mem' => 'http2,mem',
+    'h2-req-cpu' => 'http2,cpu',
+
+    'h3parallel-speed' => 'http3,speed',
+    'h3parallel-mem' => 'http3,mem',
+    'h3parallel-cpu' => 'http3,cpu',
+    'h3parallel-upload-speed' => 'http3,speed',
+    'h3parallel-upload-mem' => 'http3,mem',
+    'h3parallel-upload-cpu' => 'http3,cpu',
+    'h3-requests' => 'http3,parallel',
+    'h3-req-mem' => 'http3,mem',
+    'h3-req-cpu' => 'http3,cpu',
+
+    'snprintf' => 'printf',
+    'maprintf' => 'printf',
+    'simplef' => 'printf',
+    );
+
+
 opendir(my $dh, $logdir) || die "Can't open dir: $!";
 my @logs = grep { /^perf.*\.log/ && -f "$logdir/$_" } readdir($dh);
 closedir $dh;
@@ -634,6 +672,18 @@ sub show {
         $f, scalar(@o) - 1;
     push @out, "<img src=\"0-$filename-$suffix.svg\">\n";
 
+    my $gname = $groups{$filename};
+    if($gname) {
+        # add this to the group displays
+        my @a = split(/,/, $gname);
+        for my $g (@a) {
+            open(F, ">>$outdir/$g.html");
+            print F "<h2>$name</h2>\n";
+            print F "<img src=\"0-$filename-$suffix.svg\">\n";
+            close(F);
+        }
+    }
+
     if(scalar(@o) > $roundspergraph) {
         my $n = scalar(@o);
         my $img = 1;
@@ -1094,6 +1144,20 @@ HEAD
 
 builddetails($numrounds);
 
+my %groupnames;
+for my $g (values %groups) {
+    my @a = split(/,/, $g);
+    for my $e (@a) {
+        $groupnames{$e}++;
+    }
+}
+
+for my $g (keys %groupnames) {
+    open(G, ">$outdir/$g.html");
+    print G "<a href=\"index.html\">Back to perf index</a>\n";
+    close(G);
+}
+
 my @output;
 my @deltas;
 
@@ -1285,6 +1349,14 @@ printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 for my $t (sort keys %alltests) {
     print "<a href=\"#$t\">$t</a>, ";
 }
+print "</details>\n";
+
+printf "<details><summary>test groups</summary>\n";
+
+for my $g (sort keys %groupnames) {
+    print "<a href=\"$g.html\">$g</a>, ";
+}
+
 print "</details>\n";
 
 # show deltas moving average vs std dev
