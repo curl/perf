@@ -56,6 +56,15 @@ my %groups = (
     'snprintf' => 'printf',
     'maprintf' => 'printf',
     'simplef' => 'printf',
+
+    'easy-handle' => 'structs',
+    'multi-handle' => 'structs',
+    'connectdata' => 'structs',
+
+    'b64enc' => 'encoders',
+    'b64dec' => 'encoders',
+    'urlencode' => 'encoders',
+    'urldecode' => 'encoders',
     );
 
 
