@@ -692,6 +692,7 @@ sub show {
             close(F);
         }
     }
+    push @out, "</details>\n";
 
     if(scalar(@o) > $roundspergraph) {
         my $n = scalar(@o);
@@ -711,7 +712,6 @@ sub show {
             $img++;
         }
     }
-    push @out, "</details>\n";
 
     push @out, "<details><summary>Description</summary>\n";
     push @out, showdocs($filename);
