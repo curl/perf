@@ -1360,7 +1360,7 @@ for my $t (sort keys %alltests) {
 }
 print "</details>\n";
 
-printf "<details><summary>test groups</summary>\n";
+printf "<details><summary>data groups</summary>\n";
 
 for my $g (sort keys %groupnames) {
     print "<a href=\"$g.html\">$g</a>, ";
