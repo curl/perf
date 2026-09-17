@@ -117,6 +117,9 @@ date "$PREF ----- URL encode -----"
 date "$PREF ----- URL decode -----"
 ./tests/perf/perf urldecode | sed 's/^/urldec: /'
 
+date "$PREF ----- date parser -----"
+./tests/perf/perf dateparser | sed 's/^/dateparser: /'
+
 # Remember the markers when this ran
 cat $PERFDIR/stakes.conf | sed 's/^/stakes: /'
 date "$PREF done"
