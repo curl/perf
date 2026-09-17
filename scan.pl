@@ -940,6 +940,9 @@ sub single {
         elsif(/^urlparser: Time\/URL: ([0-9.]+) ns/) {
             $urlparser{$scan} = $1;
         }
+        elsif(/^dateparser: Time\/date: ([0-9.]+) ns/) {
+            $dateparser{$scan} = $1;
+        }
         elsif(/^snprintf: Time\/loop: ([0-9.]+) ns/) {
             $snprintf{$scan} = $1;
         }
@@ -1352,6 +1355,10 @@ push @output, show("URL decode",
                    "lower",
                    "urldecode",
                    "nanoseconds", %urldec) if %urldec;
+push @output, show("date parsing",
+                   "lower",
+                   "dateparser",
+                   "nanoseconds", %dateparser) if %dateparser;
 
 printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 
