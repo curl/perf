@@ -65,6 +65,10 @@ my %groups = (
     'b64dec' => 'encoders',
     'urlencode' => 'encoders',
     'urldecode' => 'encoders',
+
+    'dateparser' => 'parsers',
+    'urlparser' => 'parsers',
+    'numparser' => 'parsers',
     );
 
 
