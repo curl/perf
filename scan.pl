@@ -943,6 +943,9 @@ sub single {
         elsif(/^dateparser: Time\/date: ([0-9.]+) ns/) {
             $dateparser{$scan} = $1;
         }
+        elsif(/^numparser: Time\/num: ([0-9.]+) ns/) {
+            $numparser{$scan} = $1;
+        }
         elsif(/^snprintf: Time\/loop: ([0-9.]+) ns/) {
             $snprintf{$scan} = $1;
         }
@@ -1359,6 +1362,10 @@ push @output, show("date parsing",
                    "lower",
                    "dateparser",
                    "nanoseconds", %dateparser) if %dateparser;
+push @output, show("number parsing",
+                   "lower",
+                   "numparser",
+                   "nanoseconds", %numparser) if %numparser;
 
 printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 
