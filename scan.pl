@@ -947,7 +947,7 @@ sub single {
         elsif(/^dateparser: Time\/date: ([0-9.]+) ns/) {
             $dateparser{$scan} = $1;
         }
-        elsif(/^numparser: Time\/num: ([0-9.]+) ns/) {
+        elsif(/^numparser: Time\/num:  ([0-9.]+) ns/) {
             $numparser{$scan} = $1;
         }
         elsif(/^snprintf: Time\/loop: ([0-9.]+) ns/) {
