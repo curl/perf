@@ -12,9 +12,6 @@ my $commitbase = "https://github.com/curl/curl/commit";
 # entries to store in each CSV
 my $roundspergraph = 100;
 
-# Show deltas at the top when mean is this many percent diff vs marker
-my $deltathreshold = 0.7;
-
 # Use these many values for the moving average
 my $movingaverage = 25;
 
@@ -296,26 +293,6 @@ sub storelttb {
     return $p_value;
 }
 
-# Figure out the median marker per round (commit)
-sub markerpercommit {
-    my ($filename, $aref) = @_;
-    my %sta;
-    my %med;
-    for my $key (sort keys %$aref) {
-        my $commit = $git{$key};
-        my $bar;
-        if($marker{$key, $filename, 'val'}) {
-            # there is a specific marker for this test in this build
-            $bar = $marker{$key, $filename, 'val'};
-        }
-        $sta{$commit} .= "$bar " if($bar);
-    }
-    for my $c(keys %sta) {
-        $med{$c} = median(split(/ /, $sta{$c}));
-    }
-    return %med;
-}
-
 sub gencsv {
     my ($filename, $aref) = @_;
     my $index = 0;
@@ -324,10 +301,7 @@ sub gencsv {
     my @allv;
     my $prevc = "";
     my @vals;
-    my $bar = "";
     my @o;
-
-    my %markers = markerpercommit($filename, $aref);
 
     for my $key (sort keys %$aref) {
         my $commit = $git{$key};
@@ -364,17 +338,9 @@ sub gencsv {
         }
         $movingav = mean(@movingav);
 
-        # there is a specific marker for this test in this build
-        $bar = $markers{$prevc};
-
-        if(($bar > 1.2 * $v) || ($bar < 0.8 * $v)) {
-            # bad bar, ignore
-            $bar = "";
-        }
-
         push @o,
             sprintf "%u;%s;%s;%s;%s;%s;%s;%.2f\n", $index++, $gitalias{$prevc},
-            $min, $v, $max, $movingav, $bar, mean(@allv);
+            $min, $v, $max, $movingav, "", mean(@allv);
         $prevc = $commit;
     }
 
@@ -386,15 +352,9 @@ sub gencsv {
         shift @movingav;
     }
     $movingav = mean(@movingav);
-    # there is a specific marker for this test in this build
-    $bar = $markers{$prevc};
 
-    if(($bar > 1.2 * $v) || ($bar < 0.8 * $v)) {
-        # bad bar, ignore
-        $bar = "";
-    }
     push @o, sprintf "%u;%s;%s;%s;%s;%s;%s;%.2f\n", $index++, $gitalias{$prevc},
-        $min, $v, $max, $movingav, $bar, mean(@allv);
+        $min, $v, $max, $movingav, "", mean(@allv);
     return @o;
 }
 
@@ -593,7 +553,6 @@ sub show {
     my ($p0, $p25, $p50, $p75, $p100);
     my $mean;
     my $decimals = $unit2dec{$unit};
-    my $bar = $marker{"default", $filename, 'val'};
     my @out;
     push @out, "<h2>$name <a name=\"$filename\" href=\"#$filename\">($filename)</a></h2>";
     push @out, "$which is better, $unit\n";
@@ -638,25 +597,6 @@ sub show {
         push @out, sprintf ", %.2f%% of mean", ($p100 - $p0)/2 * 100 / $mean;
     }
     push @out, "\n";
-    if($bar) {
-        my $avdelta;
-        my $p50delta;
-        push @out, sprintf "\nMarker:  %s %s ('marker' is a set typical value for this test)\n",
-            $marker{"default", $filename, 'date'},
-            $marker{"default", $filename, 'desc'};
-        push @out, sprintf "         %s\n", showval($bar, $decimals);
-        $avdelta = $bar - $mean;
-        push @out, sprintf "         %s from mean, (%.2f%%) %s\n",
-            showval($avdelta, $decimals),
-            ($avdelta * 100) / $mean,
-            deltaopinion($avdelta, $which);
-        $p50delta = $bar - $p50;
-        push @out, sprintf "         %s from P50, (%.2f%%) %s\n",
-            showval($p50delta, $decimals),
-            ($p50delta * 100) / $p50,
-            deltaopinion($p50delta, $which);
-    }
-
     push @out, "</pre>\n";
 
     my $suffix = int(rand(100000000));
@@ -1004,9 +944,6 @@ sub single {
         elsif(/^confopts: (.*)/) {
             push @confopts, $1;
         }
-        elsif(/^stakes: (.*)/) {
-            push @markers, $1;
-        }
         elsif(/^structs: (.*)\t(\d+)\t\d*/) {
             my ($struct, $size) = ($1,$2);
             if($struct eq "Curl_easy") {
@@ -1112,9 +1049,6 @@ sub single {
         }
     }
 }
-
-# Load the current markers. Each build has its own set.
-loadmarkers("stakes.conf");
 
 for my $l (sort @logs) {
     single("$logdir/$l");
