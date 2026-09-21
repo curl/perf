@@ -123,6 +123,4 @@ date "$PREF ----- date parser -----"
 date "$PREF ----- number parser -----"
 ./tests/perf/perf numparser | sed 's/^/numparser: /'
 
-# Remember the markers when this ran
-cat $PERFDIR/stakes.conf | sed 's/^/stakes: /'
 date "$PREF done"

@@ -40,14 +40,6 @@ git clone the curl source into a directory dedicated for this purpose.
 Make sure `run.sh` can be invoked from a cronjob. Edit it to call `single.sh`
 with the correct paths.
 
-## Markers
-
-The *markers* set in `stakes.conf` are highly machine and build specific so
-they should be set to suitable values per environment.
-
-The markers are embedded into each build log, so updates should not affect past
-runs.
-
 # Data
 
 For each test, lots of data is displayed:
@@ -72,23 +64,6 @@ Then follows a little table:
 - *Span* - Half the delta between *P100* and *P0* and how big portion of
   *average* that value is.
 
-To help us use performance testing over time, where we might *gradually* slow
-down or speed up or we might reset the logs and need to start over, we have
-set "ideal" or "typical" values for each test. They are called **markers**.
-Markers are set manually based on previous runs. They might need to get
-adjusted as we change code and alter conditions.
-
-Each marker has a date field and a comment, they are shown.
-Then the marker is displayed.
-
-A *delta* from the marker to the *mean* is shown and a helper that explains
-if the delta shows the current mean as better or worse compared to the
-marker.
-
-A second *delta* from the marker to the *median* (P50) is shown and a helper
-that explains if the delta shows the current median as better or worse
-compared to the marker.
-
 # Graphs
 
 ## Main data development graph
@@ -104,8 +79,7 @@ started, the round continues.
 There are three additional plots in the graph:
 
 - *mean* is the mean value taken from all builds in the set
-- *marker* is the predetermined (ideal) value to compare against for this test
-- *moving average* is the mean value of the 4 latest rounds' (median)
+- *moving mean* is the mean value of the 25 latest rounds' (median)
   values
 
 The leftmost datapoint is the oldest build round. Later ones move to the
