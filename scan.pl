@@ -738,39 +738,6 @@ sub scorecard_limitrate {
     return (0+$speed, 0+$cpu);
 }
 
-sub loadmarkers {
-    my ($file) = @_;
-    my $name;
-    my $date;
-    my $desc;
-    my $val;
-    open(S, "<$file") ||
-        die "found no $file";
-    my @all = <S>;
-    close(S);
-    storemarkers("default", @all);
-}
-
-sub storemarkers {
-    my ($build, @all) = @_;
-    for(@all) {
-        if(/^ *#/) {
-            # comment, skip
-            next;
-        }
-        if(/^\[([^ ]*)]/) {
-            $name = $1;
-        }
-        elsif(/^ *([a-z-]*): (.*)/) {
-            my ($key, $val) = ($1, $2);
-            if($key !~ /^(val|date|desc)/) {
-                die "illegal keyword in $build: $key";
-            }
-            $marker{$build, $name, $key} = $val;
-        }
-    }
-}
-
 sub builddetails {
     my ($numrounds) = @_;
     open(G, "<$outdir/git-hashes") || return;
@@ -849,7 +816,6 @@ sub single {
     my @h1puj;
     my @h2puj;
     my @h3puj;
-    my @markers;
     my @h1rate;
     my $git = "";
     my $scan = "";
@@ -958,10 +924,6 @@ sub single {
         }
     }
     close(F);
-
-    if($markers[0]) {
-        storemarkers($scan, @markers);
-    }
 
     # Downloads
     if($h1pj[0]) {
