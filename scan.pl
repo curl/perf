@@ -1116,15 +1116,15 @@ push @output, show("Memory use for parallel HTTP/3",
                    "bytes", %h3pbytes);
 
 push @output, show("CPU use for parallel HTTP/1",
-                   "higher",
+                   "lower",
                    "h1parallel-cpu",
                    "CPU%", %h1pcpu);
 push @output, show("CPU use for parallel HTTP/2",
-                   "higher",
+                   "lower",
                    "h2parallel-cpu",
                    "CPU%", %h2pcpu);
 push @output, show("CPU use for parallel HTTP/3",
-                   "higher",
+                   "lower",
                    "h3parallel-cpu",
                    "CPU%", %h3pcpu);
 
@@ -1155,15 +1155,15 @@ push @output, show("Memory use for parallel upload HTTP/3",
                    "bytes", %h3pubytes);
 
 push @output, show("CPU use for parallel upload HTTP/1",
-                   "higher",
+                   "lower",
                    "h1parallel-upload-cpu",
                    "CPU%", %h1pucpu);
 push @output, show("CPU use for parallel upload HTTP/2",
-                   "higher",
+                   "lower",
                    "h2parallel-upload-cpu",
                    "CPU%", %h2pucpu);
 push @output, show("CPU use for parallel upload HTTP/3",
-                   "higher",
+                   "lower",
                    "h3parallel-upload-cpu",
                    "CPU%", %h3pucpu);
 
@@ -1194,15 +1194,15 @@ push @output, show("Memory use for HTTP/3 parallel requests",
                    "bytes", %h3rbytes);
 
 push @output, show("CPU use for HTTP/1 parallel requests",
-                   "higher",
+                   "lower",
                    "h1-req-cpu",
                    "CPU%", %h1rcpu);
 push @output, show("CPU use for HTTP/2 parallel requests",
-                   "higher",
+                   "lower",
                    "h2-req-cpu",
                    "CPU%", %h2rcpu);
 push @output, show("CPU use for HTTP/3 parallel requests",
-                   "higher",
+                   "lower",
                    "h3-req-cpu",
                    "CPU%", %h3rcpu);
 
