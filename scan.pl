@@ -913,11 +913,11 @@ sub single {
         elsif(/^confopts: (.*)/) {
             push @confopts, $1;
         }
-        elsif(/^(.*) (\d+|) *configure non-debug/) {
+        elsif(/^(.?*) (\d+|) *configure non-debug/) {
             $buildstart = $1;
             $buildstartns = $2;
         }
-        elsif(/^(.*) (\d+|) *make -C tests/) {
+        elsif(/^(.?*) (\d+|) *make -C tests/) {
             $builddone = $1;
             $builddonens = $2;
         }
@@ -1027,7 +1027,7 @@ sub single {
         $buildtime{$scan} = `date +%s -d "$builddone"` -
             `date +%s -d "$buildstart"`;
         # then adjust with the nanoseconds, when available:
-        $buildtime{$scan} += ($builddonens - $buildstartns)//1000000000;
+        $buildtime{$scan} += ($builddonens - $buildstartns) / 1000000000;
     }
 }
 
