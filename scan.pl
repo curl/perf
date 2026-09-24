@@ -819,6 +819,8 @@ sub single {
     my @h1rate;
     my $git = "";
     my $scan = "";
+    my $buildstart;
+    my $builddone;
 
     # always just keep the latest of these
     undef @curlv;
@@ -909,6 +911,12 @@ sub single {
         }
         elsif(/^confopts: (.*)/) {
             push @confopts, $1;
+        }
+        elsif(/^(.*) configure non-debug/) {
+            $buildstart = $1;
+        }
+        elsif(/^(.*) make -C tests/) {
+            $builddone = $1;
         }
         elsif(/^structs: (.*)\t(\d+)\t\d*/) {
             my ($struct, $size) = ($1,$2);
@@ -1009,6 +1017,12 @@ sub single {
             $h1limitrate{$scan} = $speed;
             $h1limitcpu{$scan} = $cpu;
         }
+    }
+
+    if($buildstart && $builddone) {
+        # get the build time
+        $buildtime{$scan} = `date +%s -d "$builddone"` -
+            `date +%s -d "$buildstart"`;
     }
 }
 
@@ -1266,6 +1280,10 @@ push @output, show("number parsing",
                    "lower",
                    "numparser",
                    "nanoseconds", %numparser) if %numparser;
+push @output, show("autotools build time",
+                   "lower",
+                   "build",
+                   "seconds", %buildtime) if %buildtime;
 
 printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 
