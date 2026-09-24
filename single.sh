@@ -45,7 +45,7 @@ pahole lib/.libs/libcurl.a -C Curl_easy,Curl_multi,connectdata -s | sed 's/^/str
 date "$PREF make clean again"
 make clean >makeclean.log 2>&1
 
-date "$PREF configure non-debug"
+date "$PREF %N configure non-debug"
 RELOPTS="--enable-unity --disable-shared --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --with-openssl --with-ngtcp2 --with-nghttp3 --with-libssh2 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-ssls-export --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --with-backtrace --enable-ntlm --enable-smb --enable-proxy-http3 --enable-httpsig"
 
 ./configure $RELOPTS >>configure.log 2>&1
@@ -54,7 +54,7 @@ echo "confopts: $RELOPTS";
 date "$PREF make non-debug"
 make V=1 -sj20 >>make.log 2>&1
 
-date "$PREF make -C tests"
+date "$PREF %N make -C tests"
 make -C tests -sj20 >maketests.log 2>&1
 
 date "$PREF curl -V"
