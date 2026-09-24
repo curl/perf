@@ -912,11 +912,13 @@ sub single {
         elsif(/^confopts: (.*)/) {
             push @confopts, $1;
         }
-        elsif(/^(.*) configure non-debug/) {
+        elsif(/^(.*) (\d+|) *configure non-debug/) {
             $buildstart = $1;
+            $buildstartns = $2;
         }
-        elsif(/^(.*) make -C tests/) {
+        elsif(/^(.*) (\d+|) *make -C tests/) {
             $builddone = $1;
+            $builddone = $2;
         }
         elsif(/^structs: (.*)\t(\d+)\t\d*/) {
             my ($struct, $size) = ($1,$2);
@@ -1020,9 +1022,11 @@ sub single {
     }
 
     if($buildstart && $builddone) {
-        # get the build time
+        # get the build time in seconds
         $buildtime{$scan} = `date +%s -d "$builddone"` -
             `date +%s -d "$buildstart"`;
+        # then adjust with the nanoseconds, when available:
+        $buildtime{$scan} += ($buildendns - $buildstartns)//1000000000;
     }
 }
 
