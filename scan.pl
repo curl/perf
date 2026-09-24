@@ -919,7 +919,7 @@ sub single {
         }
         elsif(/^(.*) (\d+|) *make -C tests/) {
             $builddone = $1;
-            $builddone = $2;
+            $builddonens = $2;
         }
         elsif(/^structs: (.*)\t(\d+)\t\d*/) {
             my ($struct, $size) = ($1,$2);
@@ -1027,7 +1027,7 @@ sub single {
         $buildtime{$scan} = `date +%s -d "$builddone"` -
             `date +%s -d "$buildstart"`;
         # then adjust with the nanoseconds, when available:
-        $buildtime{$scan} += ($buildendns - $buildstartns)//1000000000;
+        $buildtime{$scan} += ($builddonens - $buildstartns)//1000000000;
     }
 }
 
