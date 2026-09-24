@@ -46,7 +46,7 @@ date "$PREF make clean again"
 make clean >makeclean.log 2>&1
 
 date "$PREF %N configure non-debug"
-RELOPTS="--enable-unity --disable-shared --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --with-openssl --with-ngtcp2 --with-nghttp3 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-ssls-export --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --with-backtrace --enable-proxy-http3 --enable-httpsig"
+RELOPTS="--enable-unity --disable-shared --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --with-openssl --with-ngtcp2 --with-nghttp3 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --enable-proxy-http3 --enable-httpsig"
 
 ./configure $RELOPTS >>configure.log 2>&1
 echo "confopts: $RELOPTS";
