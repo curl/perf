@@ -27,7 +27,7 @@ unset border
 
 # Add Y margins above and below the auto-scaled plot area
 # Syntax: set offset <left>, <right>, <top>, <bottom>
-set offset 0, 0, graph 0.25, graph 0.05
+set offset 0, 0, graph 0.05, graph 0.05
 
 # add a little margin below the plot to move out the key
 set bmargin 5
