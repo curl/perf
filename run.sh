@@ -12,7 +12,7 @@ echo "update curl/perf"
 git pull --quiet
 
 echo "clean out perf runs older than $DAYS"
-find "$LOGDIR/" -ctime +$DAYS -delete
+find "$LOGDIR/" -type f -ctime +$DAYS -delete
 
 echo "runs single.sh $CODE to $LOGDIR"
 
