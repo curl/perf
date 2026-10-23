@@ -66,6 +66,7 @@ my %groups = (
     'dateparser' => 'parsers',
     'urlparser' => 'parsers',
     'numparser' => 'parsers',
+    'respheaders' => 'http1,parsers',
     );
 
 
@@ -874,6 +875,9 @@ sub single {
         elsif(/^urldec: Time\/loop: ([0-9.]+) ns/) {
             $urldec{$scan} = $1;
         }
+        elsif(/^respheaders: many.* ([0-9.]+) ns/loop) {
+            $respheaders{$scan} = $1;
+        }
         elsif(/^h1p:(.*)/) {
             push @h1pj, $1; # json
         }
@@ -1289,6 +1293,10 @@ push @output, show("autotools build time",
                    "lower",
                    "build",
                    "seconds", %buildtime) if %buildtime;
+push @output, show("HTTP/1 response header parsing",
+                   "lower",
+                   "respheaders",
+                   "nanoseconds", %respheaders) if %respheaders;
 
 printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 
