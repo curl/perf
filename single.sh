@@ -123,7 +123,10 @@ date "$PREF ----- date parser -----"
 date "$PREF ----- number parser -----"
 ./tests/perf/perf numparser | sed 's/^/numparser: /'
 
-date "$PREF ----- response haeder parser -----"
+date "$PREF ----- response header parser -----"
 ./tests/perf/perf respheaders 100000 | sed 's/^/respheaders: /'
+
+date "$PREF ----- websocket receive -----"
+./tests/perf/perf wsrecv | sed 's/^/wsrecv: /'
 
 date "$PREF done"
