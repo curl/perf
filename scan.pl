@@ -70,6 +70,10 @@ my %groups = (
 
     'wsrecv125' => 'speed,WebSocket',
     'wsrecv1024' => 'speed,WebSocket',
+
+    'wsuspeed' => 'speed,WebSocket',
+    'wsumem' => 'mem,WebSocket',
+    'wsucpu' => 'cpu,WebSocket',
     );
 
 
@@ -822,6 +826,7 @@ sub single {
     my @h2puj;
     my @h3puj;
     my @h1rate;
+    my @wsupload;
     my $git = "";
     my $scan = "";
     my $buildstart;
@@ -916,6 +921,9 @@ sub single {
         }
         elsif(/^h1rate:(.*)/) {
             push @h1rate, $1;
+        }
+        elsif(/^wsupload:(.*)/) {
+            push @wsupload, $1;
         }
         elsif(/^git commit: (.*)/) {
             $git{$scan} = $1;
@@ -1033,6 +1041,15 @@ sub single {
             $h1limitrate{$scan} = $speed;
             $h1limitcpu{$scan} = $cpu;
         }
+    }
+    if($wsupload[0]) {
+        my ($speed, $mem, $cpu) = scorecard_uldata(@wsupload);
+        if($speed > $lowspeed) {
+            $wsuspeed{$scan} = $speed;
+            $wsumem{$scan} = $mem;
+            $wsucpu{$scan} = $cpu;
+        }
+
     }
 
     if($buildstart && $builddone) {
@@ -1314,6 +1331,19 @@ push @output, show("WebSocket receive 1024 byte frames",
                    "lower",
                    "wsrecv1024",
                    "nanoseconds", %wsrecv1024) if %wsrecv1024;
+
+push @output, show("Transfer speed single WebSocket upload",
+                   "higher",
+                   "wsupload",
+                   "bytes/sec", %wsuspeed) if (%wsuspeed);
+push @output, show("Memory use single WebSocket upload",
+                   "lower",
+                   "wsumem",
+                   "bytes", %wsumem) if (%wsumem);
+push @output, show("CPU use single WebSocket upload",
+                   "lower",
+                   "wsucpu",
+                   "CPU%", %wsucpu) if (%wsucpu);
 
 printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 
