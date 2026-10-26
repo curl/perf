@@ -892,6 +892,12 @@ sub single {
         elsif(/^wsrecv: 1024 .*?([0-9.]+) ns/) {
             $wsrecv1024{$scan} = $1;
         }
+        elsif(/^curlsize: .* dast dast ([0-9]+)/) {
+            $curlsize{$scan} = $1;
+        }
+        elsif(/^libcurlsize: .* dast dast ([0-9]+)/) {
+            $libcurlsize{$scan} = $1;
+        }
         elsif(/^h1p:(.*)/) {
             push @h1pj, $1; # json
         }
@@ -1344,6 +1350,16 @@ push @output, show("CPU use single WebSocket upload",
                    "lower",
                    "wsucpu",
                    "CPU%", %wsucpu) if (%wsucpu);
+
+push @output, show("curl tool binary size",
+                   "lower",
+                   "curlsize",
+                   "bytes", %curlsize) if (%curlsize);
+
+push @output, show("libcurl.a binary size",
+                   "lower",
+                   "libcurlsize",
+                   "bytes", %libcurlsize) if (%libcurlsize);
 
 printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 
