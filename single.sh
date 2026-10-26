@@ -129,4 +129,10 @@ date "$PREF ----- response header parser -----"
 date "$PREF ----- websocket receive -----"
 ./tests/perf/perf wsrecv | sed 's/^/wsrecv: /'
 
+strip src/curl
+ls -l src/curl | sed 's/^/curlsize: /'
+
+strip lib/.libs/libcurl.a
+ls -l lib/.libs/libcurl.a | sed 's/^/libcurlsize: /'
+
 date "$PREF done"
