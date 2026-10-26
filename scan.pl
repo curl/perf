@@ -67,6 +67,9 @@ my %groups = (
     'urlparser' => 'parsers',
     'numparser' => 'parsers',
     'respheaders' => 'http1,parsers',
+
+    'wsrecv125' => 'speed,WebSocket',
+    'wsrecv1024' => 'speed,WebSocket',
     );
 
 
@@ -875,8 +878,14 @@ sub single {
         elsif(/^urldec: Time\/loop: ([0-9.]+) ns/) {
             $urldec{$scan} = $1;
         }
-        elsif(/^respheaders: many.* ([0-9.]+) ns/loop) {
+        elsif(/^respheaders: many.* ([0-9.]+) ns/) {
             $respheaders{$scan} = $1;
+        }
+        elsif(/^wsrecv: 125 .*([0-9.]+) ns/) {
+            $wsrecv125{$scan} = $1;
+        }
+        elsif(/^wsrecv: 1024 .*([0-9.]+) ns/) {
+            $wsrecv1024{$scan} = $1;
         }
         elsif(/^h1p:(.*)/) {
             push @h1pj, $1; # json
@@ -1297,6 +1306,14 @@ push @output, show("HTTP/1 response header parsing",
                    "lower",
                    "respheaders",
                    "nanoseconds", %respheaders) if %respheaders;
+push @output, show("WebSocket receive 125 byte frames",
+                   "lower",
+                   "wsrecv125",
+                   "nanoseconds", %wsrecv125) if %wsrecv125;
+push @output, show("WebSocket receive 1024 byte frames",
+                   "lower",
+                   "wsrecv1024",
+                   "nanoseconds", %wsrecv1024) if %wsrecv1024;
 
 printf "<details><summary>%u data-points</summary>\n", scalar(%alltests);
 
