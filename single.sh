@@ -93,6 +93,9 @@ python3 tests/http/scorecard.py -r --request-count=100000 --request-parallel=40 
 date "$PREF ----- limit-rate -----"
 python3 tests/http/scorecard.py -d --download-count=20 --download-parallel=20 --download-sizes=100mb --limit-rate 5000K --json h1 | sed 's/^/h1rate: /'
 
+date "$PREF ----- websocket-upload -----"
+python3 tests/http/scorecard.py -v --upload-count=1 --upload-sizes=2000mb -u ws --json | sed 's/^/wsupload: /'
+
 date "$PREF ----- base64 encode -----"
 ./tests/perf/perf base64enc |  sed 's/^/b64enc: /'
 
