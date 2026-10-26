@@ -881,10 +881,10 @@ sub single {
         elsif(/^respheaders: many.* ([0-9.]+) ns/) {
             $respheaders{$scan} = $1;
         }
-        elsif(/^wsrecv: 125 .*([0-9.]+) ns/) {
+        elsif(/^wsrecv: 125 .*?([0-9.]+) ns/) {
             $wsrecv125{$scan} = $1;
         }
-        elsif(/^wsrecv: 1024 .*([0-9.]+) ns/) {
+        elsif(/^wsrecv: 1024 .*?([0-9.]+) ns/) {
             $wsrecv1024{$scan} = $1;
         }
         elsif(/^h1p:(.*)/) {
