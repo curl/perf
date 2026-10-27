@@ -68,12 +68,15 @@ my %groups = (
     'numparser' => 'parsers',
     'respheaders' => 'http1,parsers',
 
-    'wsrecv125' => 'WebSocket',
-    'wsrecv1024' => 'WebSocket',
+    'wsrecv125' => 'websocket',
+    'wsrecv1024' => 'websocket',
 
-    'wsuspeed' => 'speed,WebSocket',
-    'wsumem' => 'mem,WebSocket',
-    'wsucpu' => 'cpu,WebSocket',
+    'wsuspeed' => 'speed,websocket',
+    'wsumem' => 'mem,websocket',
+    'wsucpu' => 'cpu,websocket',
+
+    'curlsize' => 'size',
+    'libcurlsize' => 'size',
     );
 
 
