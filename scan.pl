@@ -597,7 +597,7 @@ sub show {
     my $movingav = $last[5];
 
     my $mdec = $decimals;
-    if(!$decimals && ($mean < 10000) || ($movingav < 10000)) {
+    if(($decimals < 2) && (($mean < 10000) || ($movingav < 10000))) {
         # for small values we want decimails for the mean and moving
         $mdec = 2;
     }
