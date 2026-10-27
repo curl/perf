@@ -68,8 +68,8 @@ my %groups = (
     'numparser' => 'parsers',
     'respheaders' => 'http1,parsers',
 
-    'wsrecv125' => 'speed,WebSocket',
-    'wsrecv1024' => 'speed,WebSocket',
+    'wsrecv125' => 'WebSocket',
+    'wsrecv1024' => 'WebSocket',
 
     'wsuspeed' => 'speed,WebSocket',
     'wsumem' => 'mem,WebSocket',
