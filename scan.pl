@@ -595,6 +595,12 @@ sub show {
     # the last moving average value
     my @last = split(/;/, $o[-1]);
     my $movingav = $last[5];
+
+    my $mdec = $decimals;
+    if(!$decimals && ($mean < 10000) || ($movingav < 10000)) {
+        # for small values we want decimails for the mean and moving
+        $mdec = 2;
+    }
     
     push @out, "<pre>\n";
     push @out, sprintf "%u samples, %u rounds\n", scalar(values %a), scalar(@o);
@@ -603,8 +609,8 @@ sub show {
     push @out, sprintf "P50:     %s\n", showval($p50, $decimals);
     push @out, sprintf "P75:     %s\n", showval($p75, $decimals);
     push @out, sprintf "P100:    %s\n", showval($p100, $decimals);
-    push @out, sprintf "Mean:    %s\n", showval($mean, $decimals);
-    push @out, sprintf "Moving:  %s", showval($movingav, $decimals);
+    push @out, sprintf "Mean:    %s\n", showval($mean, $mdec);
+    push @out, sprintf "Moving:  %s", showval($movingav, $mdec);
     if($mean) {
         my $mdiff = $movingav - $mean;
         push @out, sprintf ", %.2f%% from mean",  $mdiff * 100 / $mean;
@@ -612,11 +618,11 @@ sub show {
         $mdeltas{$filename} = sprintf "%.2f;%.2f",
             $mdiff * 100 / $mean, $std * 100 / $mean;
     }
-    push @out, sprintf "\nStd dev: %s", showval($std, $decimals);
+    push @out, sprintf "\nStd dev: %s", showval($std, $mdec);
     if($mean) {
         push @out, sprintf ", %.2f%% of mean",  $std * 100 / $mean;
     }
-    push @out, sprintf "\nSpan:    +-%s", showval(($p100 - $p0)/2, $decimals);
+    push @out, sprintf "\nSpan:    +-%s", showval(($p100 - $p0)/2, $mdec);
     if($mean) {
         push @out, sprintf ", %.2f%% of mean", ($p100 - $p0)/2 * 100 / $mean;
     }
