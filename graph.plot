@@ -35,7 +35,7 @@ set bmargin 5
 set xtics rotate 1 out nomirror
 set ytics out font ",24" nomirror
 
-set format y "%.2s %c"
+set format y ARG2
 
 set datafile separator ";"
 plot ARG1 using 1:6 with lines linestyle 3 title "25-round mean", \

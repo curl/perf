@@ -370,15 +370,15 @@ sub gencsv {
 }
 
 sub gensvg {
-    my ($filename, $suffix, $plots) = @_;
+    my ($filename, $suffix, $plots, $yformat) = @_;
     for (my $i = 0; $i < $plots; $i++) {
-        system("gnuplot -c $graphplot $outdir/$i-$filename.csv > $outdir/$i-$filename-$suffix.svg");
+        system("gnuplot -c $graphplot $outdir/$i-$filename.csv \"$yformat\" > $outdir/$i-$filename-$suffix.svg");
     }
 }
 
 sub genfullsvg {
-    my ($filename, $suffix) = @_;
-    system("gnuplot -c $graphplot $outdir/$filename.csv > $outdir/$filename-$suffix.svg");
+    my ($filename, $suffix, $yformat) = @_;
+    system("gnuplot -c $graphplot $outdir/$filename.csv \"$yformat\" > $outdir/$filename-$suffix.svg");
 }
 
 sub gentrendsvg {
@@ -559,6 +559,18 @@ my %unit2dec = (
     'seconds' => 3,
     );
 
+# data-point to yformat, default is "%.2s %c" if not set here
+my %yformatdata = (
+    'libcurlsize' => '%.0f', # plain as-is no decimals
+    'curlsize' => '%.0f',
+    'easy-handle' => '%.0f',
+    'multi-handle' => '%.0f',
+    'connectdata' => '%.0f',
+    'single-numallocs' => '%.1s %c',
+    'h1rate-speed' => '%.4s %c',
+    'single-maxalloc' => '%.0f',
+    );
+
 sub show {
     my ($name, $which, $filename, $unit, %a) = @_;
 
@@ -612,10 +624,16 @@ sub show {
     push @out, "</pre>\n";
 
     my $suffix = int(rand(100000000));
+
+    # gnutplot format y specifier
+    my $yformat = "%.2s %c";
+    if($yformatdata{$filename}) {
+        $yformat = $yformatdata{$filename};
+    }
     
-    gensvg($filename, $suffix, scalar(@o) / $roundspergraph);
+    gensvg($filename, $suffix, scalar(@o) / $roundspergraph, $yformat);
     if(scalar(@o) > $roundspergraph) {
-        genfullsvg("lt-$filename", $suffix);
+        genfullsvg("lt-$filename", $suffix, $yformat);
     }
 
     if(scalar(@o) > 10) {
