@@ -70,6 +70,8 @@ my %groups = (
 
     'wsrecv125' => 'websocket',
     'wsrecv1024' => 'websocket',
+    'wssend125' => 'websocket',
+    'wssend1024' => 'websocket',
 
     'wsuspeed' => 'speed,websocket',
     'wsumem' => 'mem,websocket',
@@ -919,6 +921,12 @@ sub single {
         elsif(/^wsrecv: 1024 .*?([0-9.]+) ns/) {
             $wsrecv1024{$scan} = $1;
         }
+        elsif(/^wssend: 125 .*?([0-9.]+) ns/) {
+            $wssend125{$scan} = $1;
+        }
+        elsif(/^wssend: 1024 .*?([0-9.]+) ns/) {
+            $wssend1024{$scan} = $1;
+        }
         elsif(/^curlsize: .* dast dast ([0-9]+)/) {
             $curlsize{$scan} = $1;
         }
@@ -1360,10 +1368,18 @@ push @output, show("WebSocket receive 125 byte frames",
                    "lower",
                    "wsrecv125",
                    "nanoseconds", %wsrecv125) if %wsrecv125;
+push @output, show("WebSocket send 125 byte frames",
+                   "lower",
+                   "wssend125",
+                   "nanoseconds", %wssend125) if %wssend125;
 push @output, show("WebSocket receive 1024 byte frames",
                    "lower",
                    "wsrecv1024",
                    "nanoseconds", %wsrecv1024) if %wsrecv1024;
+push @output, show("WebSocket send 1024 byte frames",
+                   "lower",
+                   "wssend1024",
+                   "nanoseconds", %wssend1024) if %wssend1024;
 
 push @output, show("Transfer speed single WebSocket upload",
                    "higher",
