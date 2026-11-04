@@ -80,7 +80,7 @@ my %groups = (
     'curlsize' => 'size',
     'libcurlsize' => 'size',
 
-    'cookierecv' => 'speed,cookies'.
+    'cookierecv' => 'speed,cookies',
     );
 
 
