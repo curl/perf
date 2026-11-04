@@ -79,6 +79,8 @@ my %groups = (
 
     'curlsize' => 'size',
     'libcurlsize' => 'size',
+
+    'cookierecv' => 'speed,cookies',
     );
 
 
@@ -927,6 +929,9 @@ sub single {
         elsif(/^wssend: 1024 .*?([0-9.]+) ns/) {
             $wssend1024{$scan} = $1;
         }
+        elsif(/^cookierecv: .*?([0-9.]+) ns/) {
+            $cookierecv{$scan} = $1;
+        }
         elsif(/^curlsize: .* dast dast ([0-9]+)/) {
             $curlsize{$scan} = $1;
         }
@@ -1393,6 +1398,11 @@ push @output, show("CPU use single WebSocket upload",
                    "lower",
                    "wsucpu",
                    "CPU%", %wsucpu) if (%wsucpu);
+
+push @output, show("Cookie receive speed",
+                   "lower",
+                   "cookierecv",
+                   "nanoseconds", %cookierecv) if %cookierecv;
 
 push @output, show("curl tool binary size",
                    "lower",
