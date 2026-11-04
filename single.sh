@@ -135,6 +135,9 @@ date "$PREF ----- websocket receive -----"
 date "$PREF ----- websocket send -----"
 ./tests/perf/perf wssend | sed 's/^/wssend: /'
 
+date "$PREF ----- cookie receive -----"
+./tests/perf/perf cookierecv | sed 's/^/cookierecv: /'
+
 date "$PREF ----- bin sizes -----"
 
 strip src/curl
