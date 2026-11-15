@@ -789,6 +789,8 @@ sub builddetails {
         if(/^([^ ]*) (.*)/) {
             my ($hash, $desc) = ($1, $2);
             push @log, $hash;
+            $desc =~ s/\</&lt;/g;
+            $desc =~ s/\>/&gt;/g;
             $desc{$hash} = $desc;
             if($gitcommits{$hash}) {
                 $order{$hash} = $age;
