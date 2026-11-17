@@ -1034,7 +1034,7 @@ sub single {
             $h3pcpu{$scan} = $cpu;
         }
     }
-    if($ftpsj[0]) {
+    if($ftpspj[0]) {
         my ($speed, $mem, $cpu) = scorecard_dldata(@ftpspj);
         if($speed > $lowspeed) {
             $ftpsp{$scan} = $speed;
