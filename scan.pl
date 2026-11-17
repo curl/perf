@@ -50,6 +50,10 @@ my %groups = (
     'h3-req-mem' => 'http3,mem',
     'h3-req-cpu' => 'http3,cpu',
 
+    'ftps-parallel-speed' => 'ftps,speed',
+    'ftps-parallel-cpu' => 'ftps,cpu',
+    'ftps-parallel-mem' => 'ftps,mem',
+
     'snprintf' => 'printf',
     'maprintf' => 'printf',
     'simplef' => 'printf',
