@@ -852,6 +852,7 @@ sub single {
     my @h1pj;
     my @h2pj;
     my @h3pj;
+    my @ftpsj;
     my @h1rj;
     my @h2rj;
     my @h3rj;
@@ -949,6 +950,9 @@ sub single {
         elsif(/^h3p:(.*)/) {
             push @h3pj, $1;
         }
+        elsif(/^ftpsp:(.*)/) {
+            push @ftpspj, $1; # json
+        }
         elsif(/^h1req:(.*)/) {
             push @h1rj, $1; # json
         }
@@ -1028,6 +1032,14 @@ sub single {
             $h3p{$scan} = $speed;
             $h3pbytes{$scan} = $mem;
             $h3pcpu{$scan} = $cpu;
+        }
+    }
+    if($ftpspj[0]) {
+        my ($speed, $mem, $cpu) = scorecard_dldata(@ftpspj);
+        if($speed > $lowspeed) {
+            $ftpsp{$scan} = $speed;
+            $ftpspbytes{$scan} = $mem;
+            $ftpspcpu{$scan} = $cpu;
         }
     }
 
@@ -1198,6 +1210,10 @@ push @output, show("Download speed parallel HTTP/3",
                    "higher",
                    "h3parallel-speed",
                    "bytes/sec", %h3p);
+push @output, show("Download speed parallel FTPS",
+                   "higher",
+                   "ftps-parallel-speed",
+                   "bytes/sec", %ftpsp);
 
 push @output, show("Memory use for parallel HTTP/1",
                    "lower",
@@ -1211,6 +1227,10 @@ push @output, show("Memory use for parallel HTTP/3",
                    "lower",
                    "h3parallel-mem",
                    "bytes", %h3pbytes);
+push @output, show("Memory use for parallel FTPS",
+                   "lower",
+                   "ftps-parallel-mem",
+                   "bytes", %ftpspbytes);
 
 push @output, show("CPU use for parallel HTTP/1",
                    "lower",
@@ -1224,6 +1244,10 @@ push @output, show("CPU use for parallel HTTP/3",
                    "lower",
                    "h3parallel-cpu",
                    "CPU%", %h3pcpu);
+push @output, show("CPU use for parallel FTPS",
+                   "lower",
+                   "ftps-parallel-cpu",
+                   "CPU%", %ftpspcpu);
 
 push @output, show("Upload speed parallel HTTP/1",
                    "higher",
