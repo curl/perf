@@ -23,7 +23,7 @@ date "$PREF make clean"
 make clean >makeclean.log 2>&1
 
 date "$PREF configure debug"
-CONFOPTS="--disable-shared --enable-debug --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --prefix=$HOME/test-curl-install --with-openssl --with-ngtcp2 --with-nghttp3 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-ssls-export --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --with-backtrace --enable-proxy-http3 --enable-httpsig"
+CONFOPTS="--disable-shared --enable-debug --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --prefix=$HOME/test-curl-install --with-openssl --with-ngtcp2 --with-nghttp3 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-ssls-export --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --with-backtrace --enable-proxy-http3 --enable-httpsig --with-test-vsftpd=/usr/sbin/vsftpd"
 ./configure $CONFOPTS >configure.log 2>&1
 
 date "$PREF make"
@@ -46,7 +46,7 @@ date "$PREF make clean again"
 make clean >makeclean.log 2>&1
 
 date "$PREF %N configure non-debug"
-RELOPTS="--enable-unity --disable-shared --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --with-openssl --with-ngtcp2 --with-nghttp3 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --enable-proxy-http3 --enable-httpsig"
+RELOPTS="--enable-unity --disable-shared --enable-ipv6 --with-gssapi --enable-werror --with-nghttp2 --with-openssl --with-ngtcp2 --with-nghttp3 --with-test-caddy=$HOME/caddy/caddy_linux_amd64 --enable-httpsrr --with-test-nghttpx=$HOME/build-nghttp2/bin/nghttpx --enable-proxy-http3 --enable-httpsig --with-test-vsftpd=/usr/sbin/vsftpd"
 
 ./configure $RELOPTS >>configure.log 2>&1
 echo "confopts: $RELOPTS";
@@ -71,6 +71,9 @@ python3 tests/http/scorecard.py -d --download-count=100 --download-parallel=50 -
 
 date "$PREF ----- h3 parallel -----"
 python3 tests/http/scorecard.py -d --download-count=100 --download-parallel=50 --download-sizes=500mb --json h3 2>h3p.log | sed 's/^/h3p: /'
+
+date "$PREF ----- ftps parallel -----"
+python3 tests/http/scorecard.py -d --download-count=100 --download-parallel=50 --download-sizes=500mb --json ftps 2>h1p.log | sed 's/^/ftpsp: /'
 
 date "$PREF ----- h1 parallel upload -----"
 python3 tests/http/scorecard.py -u --upload-count=100 --upload-parallel=50 --upload-sizes=500mb --json h1 2>h1pu.log | sed 's/^/h1pu: /'
