@@ -852,7 +852,7 @@ sub single {
     my @h1pj;
     my @h2pj;
     my @h3pj;
-    my @ftpsj;
+    my @ftpspj;
     my @h1rj;
     my @h2rj;
     my @h3rj;
