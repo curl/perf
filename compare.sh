@@ -6,12 +6,16 @@ cat <<EOF
 <html>
 <a href="./index.html">Back to index</a>
 <h1>Compare metrics between protocol versions</h1>
+
+<p>
+This is the parallel download tests for the different protocols.
+
 EOF
 
 for which in cpu speed mem; do
 
   files="out/0-ftps-parallel-$which.csv out/0-h1-parallel-$which.csv out/0-h2-parallel-$which.csv out/0-h3-parallel-$which.csv"
-  common=$(cat $files | cut '-d;' -f2 | sort | uniq -c | grep '4 R' | awk '{ print $2}')
+  common=$(cat $files | cut '-d;' -f2 | sort -k1.2n | uniq -c | grep '4 R' | awk '{ print $2}')
 
   genfiles="out/0-h1-parallel-$which.csv.compare out/0-h2-parallel-$which.csv.compare out/0-h3-parallel-$which.csv.compare out/0-ftps-parallel-$which.csv.compare"
   rm -f $genfiles
