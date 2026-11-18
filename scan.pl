@@ -23,32 +23,32 @@ my $id = int(rand(100000000));
 
 # generate grouped pages with a set of graphs
 my %groups = (
-    'h1parallel-speed' => 'http1,speed',
-    'h1parallel-mem' => 'http1,mem',
-    'h1parallel-cpu' => 'http1,cpu',
-    'h1parallel-upload-speed' => 'http1,speed',
-    'h1parallel-upload-mem' => 'http1,mem',
-    'h1parallel-upload-cpu' => 'http1,cpu',
+    'h1-parallel-speed' => 'http1,speed',
+    'h1-parallel-mem' => 'http1,mem',
+    'h1-parallel-cpu' => 'http1,cpu',
+    'h1-parallel-upload-speed' => 'http1,speed',
+    'h1-parallel-upload-mem' => 'http1,mem',
+    'h1-parallel-upload-cpu' => 'http1,cpu',
     'h1-requests' => 'http1,parallel',
     'h1-req-mem' => 'http1,mem',
     'h1-req-cpu' => 'http1,cpu',
 
-    'h2parallel-speed' => 'http2,speed',
-    'h2parallel-mem' => 'http2,mem',
-    'h2parallel-cpu' => 'http2,cpu',
-    'h2parallel-upload-speed' => 'http2,speed',
-    'h2parallel-upload-mem' => 'http2,mem',
-    'h2parallel-upload-cpu' => 'http2,cpu',
+    'h2-parallel-speed' => 'http2,speed',
+    'h2-parallel-mem' => 'http2,mem',
+    'h2-parallel-cpu' => 'http2,cpu',
+    'h2-parallel-upload-speed' => 'http2,speed',
+    'h2-parallel-upload-mem' => 'http2,mem',
+    'h2-parallel-upload-cpu' => 'http2,cpu',
     'h2-requests' => 'http2,parallel',
     'h2-req-mem' => 'http2,mem',
     'h2-req-cpu' => 'http2,cpu',
 
-    'h3parallel-speed' => 'http3,speed',
-    'h3parallel-mem' => 'http3,mem',
-    'h3parallel-cpu' => 'http3,cpu',
-    'h3parallel-upload-speed' => 'http3,speed',
-    'h3parallel-upload-mem' => 'http3,mem',
-    'h3parallel-upload-cpu' => 'http3,cpu',
+    'h3-parallel-speed' => 'http3,speed',
+    'h3-parallel-mem' => 'http3,mem',
+    'h3-parallel-cpu' => 'http3,cpu',
+    'h3-parallel-upload-speed' => 'http3,speed',
+    'h3-parallel-upload-mem' => 'http3,mem',
+    'h3-parallel-upload-cpu' => 'http3,cpu',
     'h3-requests' => 'http3,parallel',
     'h3-req-mem' => 'http3,mem',
     'h3-req-cpu' => 'http3,cpu',
@@ -1183,7 +1183,7 @@ for my $g (values %groups) {
 
 for my $g (keys %groupnames) {
     open(G, ">$outdir/$g.html");
-    print G "<a href=\"index.html\">Back to perf index</a>\n";
+    print G "<a href=\"index.html\">Back to index</a>\n";
     close(G);
 }
 
@@ -1205,15 +1205,15 @@ push @output, show("Allocated memory for a single HTTP transfer",
 
 push @output, show("Download speed parallel HTTP/1",
                    "higher",
-                   "h1parallel-speed",
+                   "h1-parallel-speed",
                    "bytes/sec", %h1p);
 push @output, show("Download speed parallel HTTP/2",
                    "higher",
-                   "h2parallel-speed",
+                   "h2-parallel-speed",
                    "bytes/sec", %h2p);
 push @output, show("Download speed parallel HTTP/3",
                    "higher",
-                   "h3parallel-speed",
+                   "h3-parallel-speed",
                    "bytes/sec", %h3p);
 push @output, show("Download speed parallel FTPS",
                    "higher",
@@ -1222,15 +1222,15 @@ push @output, show("Download speed parallel FTPS",
 
 push @output, show("Memory use for parallel HTTP/1",
                    "lower",
-                   "h1parallel-mem",
+                   "h1-parallel-mem",
                    "bytes", %h1pbytes);
 push @output, show("Memory use for parallel HTTP/2",
                    "lower",
-                   "h2parallel-mem",
+                   "h2-parallel-mem",
                    "bytes", %h2pbytes);
 push @output, show("Memory use for parallel HTTP/3",
                    "lower",
-                   "h3parallel-mem",
+                   "h3-parallel-mem",
                    "bytes", %h3pbytes);
 push @output, show("Memory use for parallel FTPS",
                    "lower",
@@ -1239,15 +1239,15 @@ push @output, show("Memory use for parallel FTPS",
 
 push @output, show("CPU use for parallel HTTP/1",
                    "lower",
-                   "h1parallel-cpu",
+                   "h1-parallel-cpu",
                    "CPU%", %h1pcpu);
 push @output, show("CPU use for parallel HTTP/2",
                    "lower",
-                   "h2parallel-cpu",
+                   "h2-parallel-cpu",
                    "CPU%", %h2pcpu);
 push @output, show("CPU use for parallel HTTP/3",
                    "lower",
-                   "h3parallel-cpu",
+                   "h3-parallel-cpu",
                    "CPU%", %h3pcpu);
 push @output, show("CPU use for parallel FTPS",
                    "lower",
@@ -1256,41 +1256,41 @@ push @output, show("CPU use for parallel FTPS",
 
 push @output, show("Upload speed parallel HTTP/1",
                    "higher",
-                   "h1parallel-upload-speed",
+                   "h1-parallel-upload-speed",
                    "bytes/sec", %h1pu);
 push @output, show("Upload speed parallel HTTP/2",
                    "higher",
-                   "h2parallel-upload-speed",
+                   "h2-parallel-upload-speed",
                    "bytes/sec", %h2pu);
 push @output, show("Upload speed parallel HTTP/3",
                    "higher",
-                   "h3parallel-upload-speed",
+                   "h3-parallel-upload-speed",
                    "bytes/sec", %h3pu);
 
 push @output, show("Memory use for parallel upload HTTP/1",
                    "lower",
-                   "h1parallel-upload-mem",
+                   "h1-parallel-upload-mem",
                    "bytes", %h1pubytes);
 push @output, show("Memory use for parallel upload HTTP/2",
                    "lower",
-                   "h2parallel-upload-mem",
+                   "h2-parallel-upload-mem",
                    "bytes", %h2pubytes);
 push @output, show("Memory use for parallel upload HTTP/3",
                    "lower",
-                   "h3parallel-upload-mem",
+                   "h3-parallel-upload-mem",
                    "bytes", %h3pubytes);
 
 push @output, show("CPU use for parallel upload HTTP/1",
                    "lower",
-                   "h1parallel-upload-cpu",
+                   "h1-parallel-upload-cpu",
                    "CPU%", %h1pucpu);
 push @output, show("CPU use for parallel upload HTTP/2",
                    "lower",
-                   "h2parallel-upload-cpu",
+                   "h2-parallel-upload-cpu",
                    "CPU%", %h2pucpu);
 push @output, show("CPU use for parallel upload HTTP/3",
                    "lower",
-                   "h3parallel-upload-cpu",
+                   "h3-parallel-upload-cpu",
                    "CPU%", %h3pucpu);
 
 push @output, show("HTTP/1 parallel requests",
@@ -1483,6 +1483,8 @@ if(@d) {
     print "</details>\n";
 }
 
+print "<a href=\"compare.html\">protocol comparisons</a>\n";
+
 print @output;
 
 print "<h3> configure</h3>";
@@ -1491,3 +1493,5 @@ print "<h3> curl -V</h3>\n";
 for my $c (@curlv) {
     print "$c<br>\n";
 }
+
+system("./compare.sh $id > out/compare.html");
