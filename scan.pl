@@ -18,6 +18,9 @@ my $movingaverage = 25;
 # number of entries to store in the "full range" LTTB CSV file
 my $numlttb = 100;
 
+# identifier for this run
+my $id = int(rand(100000000));
+
 # generate grouped pages with a set of graphs
 my %groups = (
     'h1parallel-speed' => 'http1,speed',
@@ -637,23 +640,21 @@ sub show {
     push @out, "\n";
     push @out, "</pre>\n";
 
-    my $suffix = int(rand(100000000));
-
     # gnutplot format y specifier
     my $yformat = "%.2s %c";
     if($yformatdata{$filename}) {
         $yformat = $yformatdata{$filename};
     }
     
-    gensvg($filename, $suffix, scalar(@o) / $roundspergraph, $yformat);
+    gensvg($filename, $id, scalar(@o) / $roundspergraph, $yformat);
     if(scalar(@o) > $roundspergraph) {
-        genfullsvg("lt-$filename", $suffix, $yformat);
+        genfullsvg("lt-$filename", $id, $yformat);
     }
 
     if(scalar(@o) > 10) {
-        gentrendsvg($filename, $suffix);
+        gentrendsvg($filename, $id);
     }
-    genpercent("p-$filename", $suffix, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$mean);
+    genpercent("p-$filename", $id, 0+$p0, 0+$p25, 0+$p50, 0+$p75, 0+$p100, 0+$mean);
 
     my $f = scalar(@o) - $roundspergraph;
     if($f < 0) {
@@ -667,7 +668,7 @@ sub show {
     push @out, "<details open>";
     push @out, sprintf "<summary>Most recent $shows rounds</summary>\n",
         $f, scalar(@o) - 1;
-    push @out, "<img src=\"0-$filename-$suffix.svg\">\n";
+    push @out, "<img src=\"0-$filename-$id.svg\">\n";
 
     my $gname = $groups{$filename};
     if($gname) {
@@ -676,7 +677,7 @@ sub show {
         for my $g (@a) {
             open(F, ">>$outdir/$g.html");
             print F "<h2>$name</h2>\n";
-            print F "<img src=\"0-$filename-$suffix.svg\">\n";
+            print F "<img src=\"0-$filename-$id.svg\">\n";
             close(F);
         }
     }
@@ -695,7 +696,7 @@ sub show {
             }
             push @out, sprintf "<details><summary>Round %u - %u (of %u)</summary>\n",
                 $first, $end, scalar(@o);
-            push @out, "<img src=\"$img-$filename-$suffix.svg\">\n";
+            push @out, "<img src=\"$img-$filename-$id.svg\">\n";
             push @out, "</details>\n";
             $img++;
         }
@@ -706,13 +707,13 @@ sub show {
     push @out, "</details>\n";
 
     push @out, "<details><summary>Data distribution</summary>\n";
-    push @out, "<p><img src=\"p-$filename-$suffix.svg\">\n";
+    push @out, "<p><img src=\"p-$filename-$id.svg\">\n";
     push @out, "</details>\n";
 
     if(scalar(@o) > $roundspergraph) {
         push @out, "<details><summary>Full range</summary>\n";
         push @out, "<p>Downsamples the entire set to $numlttb data points.\n";
-        push @out, "<img src=\"lt-$filename-$suffix.svg\">\n";
+        push @out, "<img src=\"lt-$filename-$id.svg\">\n";
         push @out, "</details>\n";
     }
     if(scalar(@o) > 10) {
@@ -727,7 +728,7 @@ END
         push @out, sprintf "Mann-Kendall says: statistically %s (P: %.4f)\n",
             $p_value < 0.05 ? "SIGNIFICANT" : "insignificant",
             $p_value;
-        push @out, "<img src=\"tr-$filename-$suffix.svg\">\n";
+        push @out, "<img src=\"tr-$filename-$id.svg\">\n";
         push @out, "</details>\n";
     }
     $alltests{$filename} = $name;
